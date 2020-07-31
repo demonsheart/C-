@@ -1,0 +1,187 @@
+;WIN OR FAIL. If win, R3=1, else R3=0; R4 represent the PLAY1 or PLAY2.
+IFWIN         ST       R1,saverR1
+              ST       R2,saverR2
+              ST       R4,saverR4
+              ST       R5,saverR5
+              ST       R6,saverR6 
+              ST       R7,saverR77 
+    
+              and      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              and      R3,R3,#0               ; Clear R3
+              and      R6,R6,#0               ; Clear R6
+              and      R2,R2,#0               ; Clear R2
+              add      R7,R0,#0
+
+;Calculate the coordinate position. R2 for list. R6 for row.
+              ld       R5,LOACA                ; Load R5 -x4000
+              add      R5,R7,R5
+find_1        add      R5,R5,#-6
+              BRn      find_2
+              add      R6,R6,#1               ; R6 to count for row
+              BRnzp    find_1
+find_2        add      R2,R5,#6               ; R2 to count for list
+              ST       R6,SaveROW             ; Save the data of row.
+              ST       R2,Savelist            ; Save the data of list.
+              
+              not      R4,R4
+              add      R4,R4,#1               ; If add -R4 to zero, match
+; Up-column              
+CHECKNEXT     add      R6,R6,#-1              ; To check whether it's flow or not
+              BRn      DIRECTION
+              add      R7,R7,#-6          
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     DIRECTION
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT
+; Down-column              
+DIRECTION     ld       R6,SaveROW
+              add      R7,R0,#0               ; Initialize the R7
+CHECKNEXT1    add      R6,R6,#1               ; To check whether it's flow or not
+              BRn      JUDGEFOUR
+              add      R7,R7,#6
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     JUDGEFOUR
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT1
+
+JUDGEFOUR     add      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      CROW                   ; Else to check the next group  
+              add      R3,R3,#1
+              BRnzp    WIN         
+
+CROW          and      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+CHECKNEXT2    add      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      CROW1
+              add      R7,R7,#-1
+              ldr      R5,R7,#0
+              add      R5,R4,R5
+              BRnp     CROW1
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT2
+
+CROW1         add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+CHECKNEXT3    add      R2,R2,#1               ; To check whether it's flow or not
+              add      R5,R2,#-6
+              BRzp     JUDGEFOUR2     
+              add      R7,R7,#1
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     JUDGEFOUR2
+              add      R1,R1,#1               ; If match, increment count 
+              BRnzp    CHECKNEXT3 
+
+JUDGEFOUR2    add      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      INCLINED               ; Else to check the next group
+              add      R3,R3,#1
+              BRnzp    WIN  
+
+INCLINED      and      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+              ld       R6,SaveROW
+              
+NEXTINCL      add      R6,R6,#-1              ; To check whether it's flow or not
+              BRn      INCLINED2
+              add      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      INCLINED2
+              add      R7,R7,#-7
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     INCLINED2
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTINCL
+
+INCLINED2     add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+              ld       R6,SaveROW
+
+NEXTINCL1     add      R6,R6,#1               ; To check whether it's flow or not
+              add      R5,R6,#-6
+              BRzp     JUDGEFOUR3 
+              add      R2,R2,#1               ; To check whether it's flow or not
+              add      R5,R2,#-6 
+              BRzp     JUDGEFOUR3
+              add      R7,R7,#7
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     JUDGEFOUR3
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTINCL1 
+  
+JUDGEFOUR3    add      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      BIAS                   ; Else to check the next group 
+              add      R3,R3,#1
+              BRnzp    WIN  
+
+BIAS          and      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+              ld       R6,SaveROW
+              
+NEXTBIAS      add      R6,R6,#1               ; To check whether it's flow or not
+              add      R5,R6,#-6
+              BRzp     NEXTBIAS2
+              add      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      NEXTBIAS2
+              add      R7,R7,#5
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     NEXTBIAS2
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTBIAS
+
+NEXTBIAS2     add      R7,R0,#0               ; Initialize the R7
+              ld       R2,Savelist
+              ld       R6,SaveROW
+
+NEXTBIAS1     add      R6,R6,#-1              ; To check whether it's flow or not
+              BRn      JUDGEFOUR6
+              add      R2,R2,#1               ; To check whether it's flow or not
+              add      R5,R2,#-6
+              BRzp     JUDGEFOUR6
+              add      R7,R7,#-5
+              ldr      R5,R7,#0
+              add      R5,R5,R4
+              BRnp     JUDGEFOUR6
+              add      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTBIAS1 
+  
+JUDGEFOUR6    add      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      WIN             ; Else end this subprogram
+              add      R3,R3,#1
+              BRnzp    WIN 
+               
+
+WIN           ld       R1,saverR1
+              ld       R2,saverR2
+              ld       R4,saverR4
+              ld       R5,saverR5
+              ld       R6,saverR6
+              ld       R7,saverR77
+              RET 
+;
+saverR1        .FILL    #0
+saverR2        .FILL    #0
+saverR4        .FILL    #0
+saverR5        .FILL    #0
+saverR6        .FILL    #0
+saverR77        .FILL    #0
+
+Savelist       .FILL    #0
+SaveROW        .FILL    #0  
+LOACA          .FILL    xC001
+;
+;------------------------
+saver_R0    .fill #0
+saver_R1    .fill #0
+saver_R2    .fill #0
+saver_R3    .fill #0
+saver_R4    .fill #0
+saver_R5    .fill #0
+saver_R6    .fill #0
+saver_R7    .fill #0

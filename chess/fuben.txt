@@ -1,0 +1,381 @@
+		.ORIG	x3000
+;-------------------------------------
+;main program
+	ld  R6,counter	;R6 is a counter, initialize to 18
+	jsr clear	;clear the board
+	jsr OUTC	;output the board
+MLOOP  ld  R4,play1
+AG1     jsr outp1in
+	trap x20        ;get the input
+	trap x21	;echo the input number
+	jsr judge
+	jsr outnew
+	add r5,r5,#0
+	BRnp then1
+	jsr outerr     ;if R5=0 output error
+	BRnzp AG1
+
+then1	jsr OUTC
+	jsr IFWIN      ; If match, play wins
+	add r3,r3,#0
+	BRp AWIN
+	ld r4,play2
+AG2     jsr outp2in
+	trap x20        ;get the input
+	trap x21	;echo the input number
+	jsr judge
+	jsr outnew
+	add r5,r5,#0
+	BRnp ifull
+	jsr outerr     ;if R5=0 output error
+	BRnzp AG2
+
+ifull	jsr  OUTC
+        jsr  IFWIN
+        add  R3,R3,#0
+        BRp  BWIN          ; If match, PLAY2 wins
+        add  R6,R6,#-1
+        BRp  MLOOP        ; If match, the next round
+        jsr  outtie          ; If match, output tie hint
+
+end	HALT
+
+AWIN    jsr outp1win
+	BRnzp end
+
+BWIN    jsr outp2win
+        BRnzp end
+;-------------------------------------
+
+;define area
+;----------------------
+counter   .fill #18
+play1     .fill #1
+play2     .fill #-1
+saveR0    .fill #0
+saveR1    .fill #0
+saverrR1  .fill #0
+saveR2    .fill #0
+saverrR2  .fill #0
+saveR3    .fill #0
+saverrR3  .fill #0
+saveR4    .fill #0
+saveR5    .fill #0
+saveR6    .fill #0
+saveR7    .fill #0
+saverrR7  .fill #0
+num36     .fill #36
+address   .fill x4000
+tipsIn1   .STRINGZ "Player 1, choose a column:"
+tipsIn2   .STRINGZ "Player 2, choose a column:"
+error     .STRINGZ "Invalid move. Try again."
+p1win     .STRINGZ "Player 1 Wins."
+p2win     .STRINGZ "Player 2 Wins."
+tie       .STRINGZ "Tie Game."
+ascii     .fill #-48
+asciiX    .fill x0058
+asciiO    .fill x004F
+null      .fill x002D
+space     .fill x0020
+newline   .fill x000A
+last      .fill x401E
+;Initializing checkerboard
+;-----------------------------------
+;If right input, R5=1, else R5=0; R4 means the turn of play1 / play2
+judge     ST R1,saverrR1
+          ST R2,saverrR2
+          ST R3,saverrR3
+          ST R7,saverrR7
+          
+          AND R3,R3,#0                
+          ADD R3,R3,#6          ; R3 count for the line
+          LD  R1,ascii 
+          ADD R1,R1,R0          ; convert from ASCII to number value
+          LD  R0,last           ; count the first location
+          ADD R1,R1,#-1
+          BRn BACK              ;if input<1 return    
+          ADD R2,R1,#-5		;if input>6 return
+          BRp BACK      
+          ADD R0,R0,R1        ;R0 get the address
+Check     LDR  R1,R0,#0	      ;R1 get the value
+          BRnp NEXTLINE       ;if value!=0 check the next line        
+          STR  R4,R0,#0              
+          AND  R5,R5,#0       ; R5 means the right or wrong location
+          ADD  R5,R5,#1             
+          BRnzp  BACK2        ; If match, right location
+
+NEXTLINE      ADD      R0,R0,#-6
+              ADD      R3,R3,#-1
+              BRnz     BACK	;if is full ,return
+              BRnzp    Check              ; If match, jump to check next line
+             
+BACK          AND      R5,R5,#0
+BACK2         LD       R1,saverrR1
+              LD       R2,saverrR2
+              LD       R3,saverrR3
+              LD       R7,saverrR7
+              RET 
+;
+;-----------------------------------------
+saverR0   .fill #0
+saverR7   .fill #0
+;
+outp1in  st  r7,saverR7
+	 st  r0,saverR0
+	 lea r0,tipsIn1
+	 trap x22
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+;
+outp2in  st  r7,saverR7
+	 st  r0,saverR0
+	 lea r0,tipsIn2
+	 trap x22
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outp1win st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,p1win
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outp2win st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,p2win
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outtie   st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,tie
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outerr   st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,error
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outnull  st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,null
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outx     st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,asciiX
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outO     st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,asciiO
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outspa   st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,space
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outnew   st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+;--------------------------------------
+; output the board
+OUTC	ST R0,save_R0
+	ST R1,save_R1
+	ST R2,save_R2
+	ST R3,save_R3
+	ST R4,save_R4
+	ST R7,save_R7
+
+	and R3,R3,#0
+	LD  R4,num36
+	LD  R1,address ; r1 is a point
+OTL	ADD R1,R1,#1
+	LDR R2,R1,#-1  ; r2 is the value of r1
+ 	BRp putO
+	BRz pnull
+       	BRn putX
+putO    jsr outO
+	BRnzp then
+putX    jsr outx
+	BRnzp then
+pnull   jsr outnull
+then    add r3,r3,#1    ;r3 is a judge of a new line
+	add r0,r3,#-6
+  	BRz nline
+	jsr outspa
+	BRnzp OTLL
+nline   and r3,r3,#0
+	jsr outnew
+OTLL	add r4,r4,#-1
+        BRp OTL
+
+	LD R0,save_R0
+        LD R1,save_R1
+        LD R2,save_R2
+        LD R3,save_R3
+	LD R4,save_R4
+        LD R7,save_R7          
+        RET
+;-------------------------------------
+save_R0    .fill #0
+save_R1    .fill #0
+save_R2    .fill #0
+save_R3    .fill #0
+save_R4    .fill #0
+save_R5    .fill #0
+save_R6    .fill #0
+save_R7    .fill #0
+num_36     .fill #36
+add_ress   .fill x4000
+;
+clear ST R1,save_R1
+      ST R2,save_R2
+      ST R3,save_R3
+      
+      LD R1,add_ress
+      LD R2,num_36
+      AND R3,R3,#0
+CL    STR R3,R1,#0
+      ADD R1,R1,#1
+      ADD R2,R2,#-1
+      BRzp CL  
+      LD R3,save_R3
+      LD R2,save_R2
+      LD R1,save_R1
+	RET
+;-----------------------
+;WIN OR FAIL. If win, R3=1, else R3=0; R4 means the turn of play1 / play2
+IFWIN   ST R1,saver_R1
+        ST R2,saver_R2
+        ST R4,saver_R4
+        ST R5,saver_R5
+        ST R6,saver_R6 
+        ST R7,saver_R7 
+
+        and r3,r3,#0
+	jsr location  
+;now test column 
+test1   and r4,r4,#0
+	and r5,r5,#0
+	add r5,r5,#4    ;loop nums
+	ld  r1,LOC        		      
+t1_1	ldr r2,r1,#0
+	add r4,r4,r2
+	add r1,r1,#6    ;next row
+	add r5,r5,#-1
+	BRnp t1_1
+	add r4,r4,#4
+	BRz te_end1     ;-4
+	add r4,r4,#-8
+        BRz te_end1	;+4
+;
+;
+test2
+	BRnzp te_end
+te_end1 and r3,r3,#0
+        add r3,r3,#1
+	BRnzp te_end
+te_end0 and r3,r3,#0
+        BRnzp te_end
+te_end  LD R1,saver_R1 
+        LD R2,saver_R2
+        LD R4,saver_R4
+        LD R5,saver_R5
+        LD R6,saver_R6 
+        LD R7,saver_R7 
+            RET
+;------------------------
+LOC .fill #0
+last1 .fill x4000
+last2 .fill x4006
+last3 .fill x400C
+last4 .fill x4012
+last5 .fill x4018
+last6 .fill x401E
+saver_R0    .fill #0
+saver_R1    .fill #0
+saver_R2    .fill #0
+saver_R3    .fill #0
+saver_R4    .fill #0
+saver_R5    .fill #0
+saver_R6    .fill #0
+saver_R7    .fill #0
+;---------------------------
+;get the location,store in LOC
+location ST R1,saverr_R1
+         ST R2,saverr_R2
+         ST R3,saverr_R3
+         ST R4,saverr_R4
+         ST R7,saverr_R7
+	
+	 and r4,r4,#0
+	 add r4,r4,#6    ;Loop from top to bottom six times at most
+	 lea r1,last1
+loc_l1   ldr r2,r1,#0
+	 add r2,r2,r0    
+	 add r2,r2,#-1   ;r2 get the column location
+	 ldr r3,r2,#0
+	 BRnp loc_stop   ;if the location isn't null ,break
+	 add r1,r1,#1
+	 add r4,r4,#-1
+	 BRz loc_stop    ;if loop six times ,break
+	 BRnzp loc_l1	 
+
+loc_stop ST R2,LOC
+	 LD R1,saverr_R1
+         LD R2,saverr_R2
+         LD R3,saverr_R3
+         LD R4,saverr_R4
+         LD R7,saverr_R7 
+	      RET
+;
+saverr_R0    .fill #0
+saverr_R1    .fill #0
+saverr_R2    .fill #0
+saverr_R3    .fill #0
+saverr_R4    .fill #0
+saverr_R5    .fill #0
+saverr_R6    .fill #0
+saverr_R7    .fill #0
+	.end
+         .END

@@ -1,0 +1,57 @@
+; 当键盘被按下，该中断程序发生，并回显十次，直到按下回车键退出中断程序
+; 
+        .ORIG    x2000         ; 中断程序存放在x2000
+
+;		保存寄存器
+		ST R0,saverR0
+		ST R1,saverR1
+        ST R2,saverR2
+		ST R3,saverR3
+        ST R4,saverR4
+        ST R5,saverR5
+        ST R6,saverR6 
+        ST R7,saverR7 
+
+;输入
+CIN     LDI      R1,KBSR       ; 键盘输入检查
+        BRzp     CIN
+        LDI      R0,KBDR
+        LD       R2,NEWLINE    ; -x000A
+        ADD      R2,R2,R0    
+        BRz      STOP     	   ; 如果遇到换行，结束
+
+;输出
+        AND      R3,R3,#0
+        ADD      R3,R3,#10
+COUT    LDI      R1,DSR        ; 屏幕就续检查
+        BRzp     COUT
+        STI      R0,DDR
+        ADD      R3,R3,#-1
+        BRp      COUT
+		BRnzp    CIN
+
+;结束
+STOP	LD R0,saverR0
+		LD R1,saverR1
+        LD R2,saverR2
+	    LD R3,saverR3
+        LD R4,saverR4
+        LD R5,saverR5
+        LD R6,saverR6 
+        LD R7,saverR7 
+        RTI                    
+
+KBSR   .FILL     xFE00
+KBDR   .FILL     xFE02
+DSR    .FILL     xFE04
+DDR    .FILL     xFE06
+NEWLINE .FILL    xFFF6
+saverR0 .FILL 	 #0
+saverR1 .FILL 	 #0
+saverR2 .FILL 	 #0
+saverR3 .FILL 	 #0
+saverR4 .FILL  	 #0
+saverR5 .FILL 	 #0
+saverR6 .FILL  	 #0
+saverR7 .FILL 	 #0
+        .END

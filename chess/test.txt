@@ -1,0 +1,480 @@
+	.ORIG	x3000
+	AND	R6, R6, #0
+	LD	R6, Set			;赋-19给R6
+	LD	R5, Player1		;R5指向当前棋手
+	JSR	ShowMap			;ShowMap为输出棋盘的子程序
+	AND	R4, R4, #0		;R4为胜利条件
+	LD	R2, Round		;将36储存在R2寄存器中，结束36回合时平局
+
+LOOP	JSR	P_C			;
+	GETC				;输出当前选手信息
+	OUT				;
+	AND	R1, R1, #0
+	ADD	R1, R0, R6		;R0与R6相加，使输入的棋子落在棋盘底下
+	LD	R0, ENTER
+	OUT
+	JSR	IfLegal			;判断输入字符是否合法，非法则置R1为0
+	ADD	R1, R1, #0
+	BRnp	legal
+	BRnzp	LOOP
+legal	JSR	SetC			;使棋子落在棋盘，如果越界则置R1为0
+	ADD	R1, R1, #0
+	BRz	LOOP
+	JSR	ShowMap			;输出下棋后的棋盘
+	LD	R3, CH_ADD
+	JSRR	R3			;检查是否达成胜利条件，若满足则置R4为1
+	ADD	R4, R4, #0
+	BRp	Win
+	JSR	GetP			;交换棋手
+	ADD	R2, R2, #-1		;回合数-1，为0时结束比赛
+	BRnp	LOOP
+	LEA	R0, Tie
+	PUTS
+	LD	R0, ENTER
+	OUT
+	BRnzp	END
+Win	LD	R3, Win_ADD		
+	JSRR	R3			;输出棋手胜利的信息
+END	HALT
+
+
+Set	.FILL	xFFED			;数值为-19
+CH_ADD	.FILL	x318B			;检查棋盘的子函数地址
+Win_ADD	.FILL	x3178			;输出胜利学习的子函数地址
+Round	.FILL	x0024			;回合数
+;
+;输出当前棋盘
+;
+ShowMap	ST	R7, SaveR7
+	ST	R2, SaveR2
+	LEA	R1, Map			;R1保存棋盘首地址	
+	AND	R2, R2, #0
+	ADD	R2, R2, #6
+LOOP_S1	AND	R3, R3, #0
+	ADD	R3, R3, #6
+LOOP_S2	LDR	R0, R1, #0
+	OUT
+	LD	R0, SPACE
+	OUT
+	ADD	R1, R1, #1		;R1指向下一位格子
+	ADD	R3, R3, #-1		
+	BRnp	LOOP_S2
+	LD	R0, ENTER
+	OUT
+	ADD	R2, R2, #-1
+	BRnp	LOOP_S1
+	LD	R0, ENTER
+	OUT
+	LD	R2, SaveR2
+	LD	R7, SaveR7
+	RET
+
+;
+;落棋
+;
+SetC	ST	R7, SaveR7
+	JSR	SaveReg
+	AND	R6, R6, #0
+	ADD	R6, R6, #6
+	LD	R3, Empty		;R3保存空格子的数值
+	LEA	R4, Map
+	ADD	R4, R4, R1		;R1为主程序输入的列数，R4与R1相加，此时R4为该列最后一行的地址
+L_Set1	AND	R2, R2, #0
+	LDR	R2, R4, #0
+	NOT 	R2, R2
+       	ADD 	R2, R2, #1
+       	ADD 	R2, R2, R3		;如果R2+R3为0，说明以R4为地址的棋盘格数为空，可以将当前棋子保存在R4的地址中
+	BRz	L_Set2
+	ADD	R6, R6, #-1		;如果R6为0，则说明该列已经下满6棋子，棋盘越界
+	BRz	cross
+	ADD	R4, R4, #-6		;R4指向上一行
+	BRnzp	L_Set1
+L_Set2	STR	R5, R4, #0
+	BRnzp	L_Ret
+cross	LEA	R0, Cross
+	PUTS
+	LD	R0, ENTER
+	OUT
+	OUT
+	AND	R1, R1, #0
+	ST	R1, SaveR1
+L_Ret	JSR	Restore
+	LD	R7, SaveR7
+	RET
+
+;
+;选择棋手
+;
+GetP	ST	R7, SaveR7
+	JSR	SaveReg
+	LD	R4, Player1
+	NOT 	R4, R4
+ 	ADD 	R4, R4, #1
+     	ADD 	R4, R4, R5		;如果R4与R5相加为0，说明此时为玩家1，交换为玩家2；否则换成玩家1
+	BRz	P2
+	LD	R5, Player1
+	BRnzp	GET_END
+P2	LD	R5, Player2
+GET_END	ST	R5, SaveR5
+	JSR	Restore
+	LD	R7, SaveR7
+	RET
+;
+
+;保存数据
+;
+SaveReg	ST	R1, SaveR1
+	ST	R2, SaveR2
+	ST	R3, SaveR3
+	ST	R4, SaveR4
+	ST	R5, SaveR5
+	ST	R6, SaveR6
+	RET
+
+;
+;读取数据
+;
+Restore	LD	R1, SaveR1
+	LD	R2, SaveR2
+	LD	R3, SaveR3
+	LD	R4, SaveR4
+	LD	R5, SaveR5
+	LD	R6, SaveR6
+	RET
+
+;
+;输出选手信息
+;
+P_C	ST	R7, SaveR7
+	JSR	SaveReg
+	LD	R4, Player2
+	NOT 	R4, R4
+ 	ADD 	R4, R4, #1
+     	ADD 	R4, R4, R5		;判断当前下棋的选手
+	BRz	P2_CC
+	LEA	R0, P1_C
+	PUTS
+	BRnzp	C_END
+P2_CC	LEA	R0, P2_C		;P2_C与P1_C分别为玩家2和玩家1的字符串语句
+	PUTS
+C_END	JSR	Restore
+	LD	R7, SaveR7
+	RET
+
+;
+;判断输入是否合法
+;
+IfLegal	ST	R7, SaveR7
+	JSR	SaveReg
+	AND	R2, R2, #0
+	ADD	R2, R2,	#-1
+	LD	R3, Set0		;R3的值为-29
+	AND	R4, R4, #0
+	ADD	R4, R4,	#6
+if_Leg	ADD	R3, R3, R1		;R3与R1相加，使R3保存为当前输入的列数，如果是1~6则合法
+	ADD	R3, R3, R2
+	BRz	Legal
+	AND	R3, R3, #0
+	ADD	R2, R2, #-1
+	ADD	R4, R4, #-1		;R4与R2同时-1，若R4比R3先为0，则说明列数大于6，输入非法
+	BRz	illegal
+	LD	R3, Set0
+	BRnzp	if_Leg
+illegal	LEA	R0, il_le
+	PUTS
+	LD	R0, ENTER
+	OUT
+	OUT
+	AND	R1, R1, #0
+	ST	R1, SaveR1
+Legal	JSR	Restore
+	LD	R7, SaveR7
+	RET
+
+Player1	.FILL	x0078			;玩家1的棋子，为x
+Player2 .FILL	x006F			;玩家2的棋子，为o
+ENTER	.FILL	x000A			;回车
+SPACE	.FILL	x0020			;空格
+P1_C    .STRINGZ  	"Player 1, choose a column: "
+P2_C    .STRINGZ  	"Player 2, choose a column: " 
+il_le   .STRINGZ  	"Invalid move. Try again. " 
+Cross   .STRINGZ  	"Cross the border. Try again. " 
+Tie   	.STRINGZ  	"Tie Game."
+
+SaveR1	.FILL	x0000
+SaveR2	.FILL	x0000
+SaveR3	.FILL	x0000
+SaveR4	.FILL	x0000
+SaveR5	.FILL	x0000
+SaveR6	.FILL	x0000
+SaveR7	.FILL	x0000
+
+Set0	.FILL	xFFE3
+Empty	.FILL	x002D			;当期盘没有棋子时，为-
+Map	.BLKW	36	x002D		;创建一个大小为36的棋盘，全部置为-
+P1_W    .STRINGZ  	"OHHHH! Player 1 Wins."
+P2_W    .STRINGZ  	"OHHHH! Player 2 Wins."
+
+;
+;输出赢家
+;
+Winner	ST	R7, SaveR7
+	JSR	SaveReg
+	LD	R4, Player2
+	NOT 	R4, R4
+ 	ADD 	R4, R4, #1
+     	ADD 	R4, R4, R5
+	BRz	P2_WW
+	LEA	R0, P1_W
+	PUTS
+	LD	R0, ENTER
+	OUT
+	BRnzp	W_END
+P2_WW	LEA	R0, P2_W
+	PUTS
+	LD	R0, ENTER
+	OUT
+W_END	JSR	Restore
+	LD	R7, SaveR7
+	RET
+
+;
+;检查棋盘是否达成胜利条件
+;
+Check	ST	R7, SaveR7
+	JSR	SaveReg
+	LEA	R6, Map			;R6为检测的棋盘地址，将棋盘对称分为左上、左下、右上、右下四块，每块对应一个九宫格
+	AND	R2, R2, #0
+	ADD	R2, R2, #3
+Ch_L1	AND	R3, R3, #0
+       	ADD 	R3, R3, #3		
+Ch_L2	JSR	Count1			;Count1用于数左上的格子；若有四子连珠，置R4为1，下同
+	ADD	R4, R4, #0
+	BRp	Ch_End
+	JSR	Count2			;Count2用于数右上的格子
+	ADD	R4, R4, #0
+	BRp	Ch_End
+	JSR	Count3			;Count3用于数左下的格子，当三个范围的格子没有四子连珠时，可以得知右下的格子也没有	
+	ADD	R4, R4, #0
+	BRp	Ch_End
+	ADD	R6, R6, #1
+	ADD 	R3, R3, #-1
+	BRnp	Ch_L2
+	ADD	R6, R6, #3
+	ADD 	R2, R2, #-1
+	BRnp	Ch_L1
+
+	BRnzp	Ch_Ret
+Ch_End	ST	R4, SaveR4
+Ch_Ret	JSR	Restore
+	LD	R7, SaveR7
+	RET
+
+;
+;检测棋盘左上、右上、左下区域的棋子
+;
+Count1	ST	R7, _SaveR7		;用于数棋盘左上棋子，下面右上、左下的方法类似
+	JSR	_SaveR
+	AND	R1, R1, #0
+	ADD	R1, R1, R5		;R1保存为当前玩家的棋子
+	NOT	R1, R1
+	ADD	R1, R1, #1
+	JSR	R1_4			;将R1变成当前的四倍
+
+	AND	R3, R3, #0		;该判断为当前格子横向连珠个数
+	ADD	R3, R3, R1		;R3保存R1的数值，通过不断累加连续四格的棋子来判断是否连珠
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co1_L1	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #1
+	ADD	R5, R5, #-1
+	BRnp	Co1_L1
+	ADD	R3, R3, #0		;若R3为零，说明当前连续四格格子的棋子与玩家的棋子相同，达成胜利条件
+	BRz	Co1_End
+					;以下的判断逻辑均与上面相同，并根据累加方向、所处范围作了修改
+	LD	R6, _SaveR6		;该判断为当前格子纵向连珠个数
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co1_L2	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #6
+	ADD	R5, R5, #-1
+	BRnp	Co1_L2
+	ADD	R3, R3, #0
+	BRz	Co1_End
+
+	LD	R6, _SaveR6		;该判断为当前格子斜向连珠个数
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co1_L3	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #7
+	ADD	R5, R5, #-1
+	BRnp	Co1_L3
+	ADD	R3, R3, #0
+	BRz	Co1_End
+	
+	BRnzp	Co1_Ret
+Co1_End	ADD	R4, R4, #1
+	ST	R4, _SaveR4
+Co1_Ret	JSR	_RestR
+	LD	R7, _SaveR7
+	RET
+
+Count2	ST	R7, _SaveR7		;用于数棋盘右上棋子
+	JSR	_SaveR
+	AND	R1, R1, #0
+	ADD	R1, R1, R5
+	NOT	R1, R1
+	ADD	R1, R1, #1
+	ADD	R6, R6, #3
+	JSR	R1_4
+
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co2_L1	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #-1
+	ADD	R5, R5, #-1
+	BRnp	Co2_L1
+	ADD	R3, R3, #0
+	BRz	Co2_End
+
+	LD	R6, _SaveR6
+	ADD	R6, R6, #3	
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co2_L2	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #6
+	ADD	R5, R5, #-1
+	BRnp	Co2_L2
+	ADD	R3, R3, #0
+	BRz	Co2_End
+
+	LD	R6, _SaveR6
+	ADD	R6, R6, #3
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co2_L3	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #5
+	ADD	R5, R5, #-1
+	BRnp	Co2_L3
+	ADD	R3, R3, #0
+	BRz	Co2_End
+	
+	BRnzp	Co2_Ret
+Co2_End	ADD	R4, R4, #1
+	ST	R4, _SaveR4
+Co2_Ret	JSR	_RestR
+	LD	R7, _SaveR7
+	RET
+
+Count3	ST	R7, _SaveR7		;用于数棋盘左下棋子
+	JSR	_SaveR
+	AND	R1, R1, #0
+	ADD	R1, R1, R5
+	NOT	R1, R1
+	ADD	R1, R1, #1
+	ADD	R6, R6, #9
+	ADD	R6, R6, #9
+	JSR	R1_4
+
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co3_L1	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #1
+	ADD	R5, R5, #-1
+	BRnp	Co3_L1
+	ADD	R3, R3, #0
+	BRz	Co3_End
+
+	LD	R6, _SaveR6
+	ADD	R6, R6, #9
+	ADD	R6, R6, #9
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co3_L2	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #-6
+	ADD	R5, R5, #-1
+	BRnp	Co3_L2
+	ADD	R3, R3, #0
+	BRz	Co3_End
+
+	LD	R6, _SaveR6
+	ADD	R6, R6, #9
+	ADD	R6, R6, #9
+	AND	R3, R3, #0
+	ADD	R3, R3, R1
+	AND	R5, R5, #0
+	ADD	R5, R5, #4
+Co3_L3	LDR	R2, R6, #0
+	ADD	R3, R3, R2
+	ADD	R6, R6, #-5
+	ADD	R5, R5, #-1
+	BRnp	Co3_L3
+	ADD	R3, R3, #0
+	BRz	Co3_End
+	
+	BRnzp	Co3_Ret
+Co3_End	ADD	R4, R4, #1
+	ST	R4, _SaveR4
+Co3_Ret	JSR	_RestR
+	LD	R7, _SaveR7
+	RET
+
+;
+;R1乘4
+;
+R1_4	ADD	R1, R1, R1
+	ADD	R1, R1, R1
+	RET
+
+_SaveR1	.FILL	x0000
+_SaveR2	.FILL	x0000
+_SaveR3	.FILL	x0000
+_SaveR4	.FILL	x0000
+_SaveR5	.FILL	x0000
+_SaveR6	.FILL	x0000
+_SaveR7	.FILL	x0000
+
+;
+;保存子程序的数据
+;
+_SaveR	ST	R1, _SaveR1
+	ST	R2, _SaveR2
+	ST	R3, _SaveR3
+	ST	R4, _SaveR4
+	ST	R5, _SaveR5
+	ST	R6, _SaveR6
+	RET
+
+;
+;读取子程序的数据
+;
+_RestR	LD	R1, _SaveR1
+	LD	R2, _SaveR2
+	LD	R3, _SaveR3
+	LD	R4, _SaveR4
+	LD	R5, _SaveR5
+	LD	R6, _SaveR6
+	RET
+	.END

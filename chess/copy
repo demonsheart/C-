@@ -1,0 +1,475 @@
+		.ORIG	x3000
+;-------------------------------------
+;主函数
+	ld  R6,counter	;R6 计数器，最多为18个回合
+	jsr clear	;清空棋盘
+	jsr OUTC	;输出棋盘
+MLOOP   ld  R4,play1
+AG1     jsr outp1in
+	trap x20        ;接收
+	trap x21	;回显
+	jsr judge       ;进入判断子程序
+	jsr outnew
+	add r5,r5,#0
+	BRnp then1
+	jsr outerr     ;如果R5=0，输出错误信息
+	BRnzp AG1
+
+then1	jsr OUTC       ;如果输入合法，回显棋盘
+	jsr IFWIN      
+	add r3,r3,#0
+	BRp AWIN        ;A获胜
+	ld r4,play2
+AG2     jsr outp2in
+	trap x20        ;接收
+	trap x21	;回显
+	jsr judge       ;进入判断子程序
+	jsr outnew
+	add r5,r5,#0
+	BRnp ifull
+	jsr outerr     ;如果R5=0，输出错误信息
+	BRnzp AG2
+
+ifull	jsr  OUTC
+        jsr  IFWIN
+        add  R3,R3,#0
+        BRp  BWIN          ;B获胜
+        add  R6,R6,#-1
+        BRp  MLOOP        ; 下一回合
+        jsr  outtie       ; 平局
+
+end	HALT
+
+AWIN    jsr outp1win
+	BRnzp end
+
+BWIN    jsr outp2win
+        BRnzp end
+;-------------------------------------
+
+;初始化区域
+;----------------------
+counter   .fill #18
+play1     .fill #1
+play2     .fill #-1
+saveR0    .fill #0
+saveR1    .fill #0
+saverrR1  .fill #0
+saveR2    .fill #0
+saverrR2  .fill #0
+saveR3    .fill #0
+saverrR3  .fill #0
+saveR4    .fill #0
+saveR5    .fill #0
+saveR6    .fill #0
+saveR7    .fill #0
+saverrR7  .fill #0
+num36     .fill #36
+address   .fill x4000
+tipsIn1   .STRINGZ "Player 1, choose a column:"
+tipsIn2   .STRINGZ "Player 2, choose a column:"
+error     .STRINGZ "Invalid move. Try again."
+p1win     .STRINGZ "Player 1 Wins."
+p2win     .STRINGZ "Player 2 Wins."
+tie       .STRINGZ "Tie Game."
+ascii     .fill #-48
+asciiX    .fill x0058
+asciiO    .fill x004F
+null      .fill x002D
+space     .fill x0020
+newline   .fill x000A
+last      .fill x401E
+;-----------------------------------
+;如果输入合法, R5=1, 否则 R5=0; R4 代表回合是play1 / play2
+judge     ST R1,saverrR1
+          ST R2,saverrR2
+          ST R3,saverrR3
+          ST R7,saverrR7
+          
+          AND R3,R3,#0                
+          ADD R3,R3,#6          ; R3代表6行
+          LD  R1,ascii 
+          ADD R1,R1,R0          ; 数值转化
+          LD  R0,last           ; 初始位置，从最下面开始扫描
+          ADD R1,R1,#-1
+          BRn BACK              ;if input<1 return    
+          ADD R2,R1,#-5		;if input>6 return
+          BRp BACK      
+          ADD R0,R0,R1        ;R0 初始化地址
+Check     LDR  R1,R0,#0	      ;R1 获得值
+          BRnp NEXTLINE       ;if value!=0 位置非空，往上寻找     
+          STR  R4,R0,#0              
+          AND  R5,R5,#0       ; R5 返回参数
+          ADD  R5,R5,#1             
+          BRnzp  BACK2        
+
+NEXTLINE      ADD      R0,R0,#-6
+              ADD      R3,R3,#-1
+              BRnz     BACK	
+              BRnzp    Check    
+             
+BACK          AND      R5,R5,#0
+BACK2         LD       R1,saverrR1
+              LD       R2,saverrR2
+              LD       R3,saverrR3
+              LD       R7,saverrR7
+              RET 
+;
+;-----------------------------------------
+saverR0   .fill #0
+saverR7   .fill #0
+;
+outp1in  st  r7,saverR7
+	 st  r0,saverR0
+	 lea r0,tipsIn1
+	 trap x22
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+;
+outp2in  st  r7,saverR7
+	 st  r0,saverR0
+	 lea r0,tipsIn2
+	 trap x22
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outp1win st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,p1win
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outp2win st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,p2win
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outtie   st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,tie
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outerr   st  r7,saverR7
+	 st  r0,saverR0
+         lea r0,error
+	 trap x22
+	 ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outnull  st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,null
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outx     st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,asciiX
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outO     st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,asciiO
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outspa   st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,space
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+outnew   st  r7,saverR7
+	 st  r0,saverR0
+         ld  r0,newline
+	 trap x21
+	 ld  r0,saverR0
+	 ld  r7,saverR7
+         RET
+;
+;--------------------------------------
+; 棋盘输出
+OUTC	ST R0,save_R0
+	ST R1,save_R1
+	ST R2,save_R2
+	ST R3,save_R3
+	ST R4,save_R4
+	ST R7,save_R7
+
+	and R3,R3,#0
+	LD  R4,num36
+	LD  R1,address ; r1 指针位
+OTL	ADD R1,R1,#1
+	LDR R2,R1,#-1  ; r2 指针指向的值
+ 	BRp putO
+	BRz pnull
+       	BRn putX
+putO    jsr outO
+	BRnzp then
+putX    jsr outx
+	BRnzp then
+pnull   jsr outnull
+then    add r3,r3,#1    ;r3 判断是否为下一行
+	add r0,r3,#-6
+  	BRz nline
+	jsr outspa
+	BRnzp OTLL
+nline   and r3,r3,#0
+	jsr outnew
+OTLL	add r4,r4,#-1
+        BRp OTL
+
+	LD R0,save_R0
+        LD R1,save_R1
+        LD R2,save_R2
+        LD R3,save_R3
+	LD R4,save_R4
+        LD R7,save_R7          
+        RET
+;-------------------------------------
+save_R0    .fill #0
+save_R1    .fill #0
+save_R2    .fill #0
+save_R3    .fill #0
+save_R4    .fill #0
+save_R5    .fill #0
+save_R6    .fill #0
+save_R7    .fill #0
+num_36     .fill #36
+add_ress   .fill x4000
+;
+clear ST R1,save_R1
+      ST R2,save_R2
+      ST R3,save_R3
+      
+      LD R1,add_ress
+      LD R2,num_36
+      AND R3,R3,#0
+CL    STR R3,R1,#0
+      ADD R1,R1,#1
+      ADD R2,R2,#-1
+      BRzp CL  
+      LD R3,save_R3
+      LD R2,save_R2
+      LD R1,save_R1
+	RET
+;-----------------------
+;获胜判断,获胜R3=1, 否则 R3=0; R4 代表 PLAY1/PLAY2.
+IFWIN         ST R1,saverR1
+              ST R2,saverR2
+              ST R4,saverR4
+              ST R5,saverR5
+              ST R6,saverR6 
+              ST R7,saverR77 
+    
+              and R1,R1,#0               
+              and R3,R3,#0               
+              and R6,R6,#0               
+              and R2,R2,#0               
+              add R7,R0,#0
+
+;计算坐标，R2存放列数，R6存放行数。
+              ld  R5,LOACA                ;R5 初始化为-x4000，为计算位置做准备
+              add R5,R7,R5
+find_1        add R5,R5,#-6
+              BRn find_2
+              add R6,R6,#1                ; R6存放行数
+              BRnzp find_1
+find_2        add R2,R5,#6                ; R2存放列数
+              ST R6,SaveROW              
+              ST R2,Savelist             
+              
+              not R4,R4
+              add R4,R4,#1                ; 为匹配玩家的棋子做准备
+; 往上扫描              
+CHECKNEXT     add  R6,R6,#-1              ; 判断是否越界
+              BRn  DIRECTION
+              add  R7,R7,#-6          
+              ldr  R5,R7,#0
+              add  R5,R5,R4
+              BRnp DIRECTION
+              add  R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp CHECKNEXT
+; 往下扫描              
+DIRECTION     ld   R6,SaveROW
+              add  R7,R0,#0               ; 初始化R7
+CHECKNEXT1    add  R6,R6,#1               ; 判断是否越界
+              BRn  JUDGEFOUR
+              add  R7,R7,#6
+              ldr  R5,R7,#0
+              add  R5,R5,R4
+              BRnp JUDGEFOUR
+              add  R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp CHECKNEXT1
+
+JUDGEFOUR     add  R5,R1,#-3              ; 如果R5>3,有人获胜
+              BRn  CROW                   ; 否则继续扫描
+              add  R3,R3,#1
+              BRnzp WIN         
+;横向扫描
+CROW          and   R1,R1,#0              ; 重新初始化和位R1
+              add   R7,R0,#0              ; 初始化地址
+              ld    R2,Savelist
+CHECKNEXT2    add   R2,R2,#-1             ; 判断是否越界
+              BRn   CROW1
+              add   R7,R7,#-1
+              ldr   R5,R7,#0
+              add   R5,R4,R5
+              BRnp  CROW1
+              add   R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp CHECKNEXT2
+
+CROW1         add   R7,R0,#0               ; 初始化地址
+              ld    R2,Savelist
+CHECKNEXT3    add   R2,R2,#1               ; 判断是否越界
+              add   R5,R2,#-6
+              BRzp  JUDGEFOUR2     
+              add   R7,R7,#1
+              ldr   R5,R7,#0
+              add   R5,R5,R4
+              BRnp  JUDGEFOUR2
+              add   R1,R1,#1               ; 成功匹配，R1+1 
+              BRnzp CHECKNEXT3 
+
+JUDGEFOUR2    add  R5,R1,#-3              ; 如果R5>3,有人获胜
+              BRn  INCLINED               ; 否则继续扫描
+              add  R3,R3,#1
+              BRnzp WIN  
+;斜右下扫描
+INCLINED      and R1,R1,#0               ; 重新初始化和位R1
+              add R7,R0,#0               ; 初始化地址
+              ld  R2,Savelist
+              ld  R6,SaveROW
+              
+NEXTINCL      add  R6,R6,#-1              ; 判断是否越界
+              BRn  INCLINED2
+              add  R2,R2,#-1              ; 判断是否越界
+              BRn  INCLINED2
+              add  R7,R7,#-7
+              ldr  R5,R7,#0
+              add  R5,R5,R4
+              BRnp INCLINED2
+              add  R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp NEXTINCL
+
+INCLINED2     add R7,R0,#0               ; 初始化地址
+              ld R2,Savelist
+              ld R6,SaveROW
+
+NEXTINCL1     add R6,R6,#1               ; 判断是否越界
+              add R5,R6,#-6
+              BRzp JUDGEFOUR3 
+              add R2,R2,#1               ; 判断是否越界
+              add R5,R2,#-6 
+              BRzp JUDGEFOUR3
+              add R7,R7,#7
+              ldr R5,R7,#0
+              add R5,R5,R4
+              BRnp JUDGEFOUR3
+              add  R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp NEXTINCL1 
+  
+JUDGEFOUR3    add R5,R1,#-3              ; 如果R5>3,有人获胜
+              BRn BIAS                   ; 否则继续扫描 
+              add R3,R3,#1
+              BRnzp WIN  
+;斜左下扫描
+BIAS          and R1,R1,#0               ; 重新初始化和位R1
+              add R7,R0,#0               ; 初始化地址
+              ld  R2,Savelist
+              ld  R6,SaveROW
+              
+NEXTBIAS      add  R6,R6,#1               ; 判断是否越界
+              add  R5,R6,#-6
+              BRzp NEXTBIAS2
+              add  R2,R2,#-1              ; 判断是否越界
+              BRn  NEXTBIAS2
+              add  R7,R7,#5
+              ldr  R5,R7,#0
+              add  R5,R5,R4
+              BRnp NEXTBIAS2
+              add R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp NEXTBIAS
+
+NEXTBIAS2     add R7,R0,#0    
+              ld  R2,Savelist
+              ld  R6,SaveROW
+
+NEXTBIAS1     add   R6,R6,#-1              ; 判断是否越界
+              BRn   JUDGEFOUR6
+              add   R2,R2,#1               ; 判断是否越界
+              add   R5,R2,#-6
+              BRzp  JUDGEFOUR6
+              add   R7,R7,#-5
+              ldr   R5,R7,#0
+              add   R5,R5,R4
+              BRnp  JUDGEFOUR6
+              add   R1,R1,#1               ; 成功匹配，R1+1
+              BRnzp NEXTBIAS1 
+  
+JUDGEFOUR6    add R5,R1,#-3              ; 如果R5>3,有人获胜
+              BRn WIN                    ; 否则，无人获胜
+              add R3,R3,#1
+              BRnzp WIN 
+               
+
+WIN     ld  R1,saverR1
+        ld  R2,saverR2
+        ld  R4,saverR4
+        ld  R5,saverR5
+        ld  R6,saverR6
+        ld  R7,saverR77
+         RET 
+;
+saverR1   .fill #0
+saverR2   .fill #0
+saverR4   .fill #0
+saverR5   .fill #0
+saverR6   .fill #0
+saverR77  .fill #0
+
+Savelist  .fill  #0
+SaveROW   .fill  #0  
+LOACA     .fill  xC001
+;
+;------------------------
+saver_R0 .fill #0
+saver_R1 .fill #0
+saver_R2 .fill #0
+saver_R3 .fill #0
+saver_R4 .fill #0
+saver_R5 .fill #0
+saver_R6 .fill #0
+saver_R7 .fill #0
+;---------------------------
+
+	.end

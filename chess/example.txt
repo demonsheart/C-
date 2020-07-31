@@ -1,0 +1,425 @@
+; The code is designed by Li Mingzhao.
+; Program is a game named Connect Four.
+; PLAY1 plays chess first. R6=1 represents the PLAY1. R6=-1 represents the PLAY2.
+; The subprogram JUDGEMENT to judge whether the chess piece is legal.
+; The subprogram IFWIN to judge whether there is a winner.
+; The subprogram OUTCB to output the ChessBoard.
+; ChessBoard to save at x4000-x4024.
+; 
+              .ORIG    x3000
+;
+              LD       R4,FULL                ; R4 is counter, initialize to 18
+              JSR      OUTCB                  ; Output the empty chessboard
+NEXTLOOP      LD       R6,PLAY1               ; Now R6 represents PLAY1's turn
+AGAIN         JSR      OUTP1IN                ; Hint to PLAY1's input
+              TRAP     x20
+              TRAP     X21
+              JSR      JUDGEMENT              ; Judge the location.
+              JSR      OUTNewLine
+
+              ADD      R5,R5,#0               ; R5=1 means right input
+              BRnp     REPLAY2                ; If match, it turns to PLAY2
+              JSR      OUTERROR 
+              BRnzp    AGAIN                  ; If no match, do AGAIN
+
+REPLAY2       JSR      OUTCB
+              JSR      IFWIN                  
+              ADD      R3,R3,#0               ; R3 means win or not  
+              BRp      ONEWIN                 ; If match, PLAY1 wins
+              LD       R6,PLAY2               ; PLAY2's turn
+AGAIN2        JSR      OUTP2IN                ; Hint to PLAY2's input
+              TRAP     x20
+              TRAP     X21
+              JSR      JUDGEMENT              ; Judge the location.
+              JSR      OUTNewLine
+
+              ADD      R5,R5,#0
+              BRnp     IFFULL                 ; If match, judge full or not
+              JSR      OUTERROR 
+              BRnzp    AGAIN2                 ; If no match, do AGAIN2
+;
+IFFULL        JSR      OUTCB
+              JSR      IFWIN
+              ADD      R3,R3,#0
+              BRp      TWOWIN                 ; If match, PLAY2 wins
+              ADD      R4,R4,#-1
+              BRp      NEXTLOOP               ; If match, the next round
+              JSR      OUTTIE                 ; If match, output tie hint
+              BRnzp    STOP                   ; Jump to HALT
+;
+ONEWIN        JSR      OUTP1WIN               ; output PLAY1 wins
+              BRnzp    STOP
+;
+TWOWIN        JSR      OUTP2WIN               ; output PLAY2 wins
+;       
+STOP          HALT
+;
+;
+;
+;
+;
+;
+OUTP1IN        ST       R7,SaveR7 
+               LEA      R0,P1IN               ; Get the address of P1IN
+               TRAP     x22                   
+               LD       R7,SaveR7
+               RET
+;             
+OUTP2IN        ST       R7,SaveR7
+               LEA      R0,P2IN               ; Get the address of P2IN
+               TRAP     x22
+               LD       R7,SaveR7
+               RET      
+;
+OUTERROR       ST       R7,SaveR7
+               ST       R0,SaveR0
+               LEA      R0,ERROR              ; Get the first address of ERROR
+               TRAP     x22
+               LD       R0,ASCIINewLine       ; Output newline
+               TRAP     x21
+               LD       R0,SaveR0
+               LD       R7,SaveR7
+               RET    
+;  
+OUTP1WIN       ST       R7,SaveR7 
+               LEA      R0,P1WIN              ; Get the address of P1WIN
+               TRAP     x22
+               LD       R0,ASCIINewLine       ; Output newline
+               TRAP     x21
+               LD       R7,SaveR7
+               RET    
+;  
+OUTP2WIN       ST       R7,SaveR7
+               LEA      R0,P2WIN              ; Get the address of P2WIN
+               TRAP     x22
+               LD       R0,ASCIINewLine       ; Output newline
+               TRAP     x21
+               LD       R7,SaveR7
+               RET      
+;
+OUTTIE         ST       R7,SaveR7
+               LEA      R0,TIE                ; Get the address of TIE
+               TRAP     x22
+               LD       R0,ASCIINewLine       ; Output newline
+               TRAP     x21
+               LD       R7,SaveR7
+               RET    
+; 
+OUTX           ST       R7,SaveR7
+               LD       R0,ASCIIX
+               TRAP     x21
+               LD       R7,SaveR7
+               RET  
+;
+OUTO           ST       R7,SaveR7
+               LD       R0,ASCIIO
+               TRAP     x21
+               LD       R7,SaveR7
+               RET  
+;
+OUTNull        ST       R7,SaveR7
+               LD       R0,ASCIINull
+               TRAP     x21
+               LD       R7,SaveR7
+               RET 
+; 
+OUTSpace       ST       R7,SaveR7
+               LD       R0,ASCIISpace
+               TRAP     x21
+               LD       R7,SaveR7
+               RET  
+;
+OUTNewLine     ST       R7,SaveR7
+               ST       R0,SaveR0
+               LD       R0,ASCIINewLine
+               TRAP     x21
+               LD       R0,SaveR0
+               LD       R7,SaveR7              
+               RET           
+;
+;
+PLAY1          .FILL    #1
+PLAY2          .FILL    #-1
+FULL           .FILL    #18
+SaveR00        .FILL    #0
+SaveR0         .FILL    #0
+SaveR1         .FILL    #0
+SaveR2         .FILL    #0
+SaveR3         .FILL    #0
+SaveR4         .FILL    #0
+SaveR5         .FILL    #0
+SaveR6         .FILL    #0
+SaveR7         .FILL    #0
+SaveR07        .FILL    #0
+  
+THIRDSIX       .FILL    #36
+ASCII          .FILL    #-48
+ChessBoard     .FILL    x4000
+LASTLINE       .FILL    x401E
+P1IN           .STRINGZ "Player 1, choose a column:"
+P2IN           .STRINGZ "Player 2, choose a column:"
+ERROR          .STRINGZ "Invalid move. Try again."
+P1WIN          .STRINGZ "Player 1 Wins."
+P2WIN          .STRINGZ "Player 2 Wins."
+TIE            .STRINGZ "Tie Game."
+ASCIIX         .FILL    x0058
+ASCIIO         .FILL    x004F
+ASCIINull      .FILL    x002D
+ASCIISpace     .FILL    x0020
+ASCIINewLine   .FILL    x000A
+;
+;
+;Judge the location. If match, R5=1, else R5=0; R6 represent the PLAY1 or PLAY2.
+JUDGEMENT     ST       R1,SaveR1
+              ST       R2,SaveR2
+              ST       R3,SaveR3
+              ST       R7,SaveR07
+              
+              AND      R3,R3,#0                
+              ADD      R3,R3,#6               ; R3 count for the line, initialize to 6
+              LD       R1,ASCII 
+              ADD      R1,R1,R0               ; Convert from ASCII to number value
+              LD       R0,LASTLINE            ; Count the first location
+              ADD      R1,R1,#-1
+              BRn      BACK                   
+              ADD      R2,R1,#-5
+              BRp      BACK      
+              ADD      R0,R0,R1
+CheckNext     LDR      R1,R0,#0
+              BRnp     NEXTLINE               ; Judge the next line
+              STR      R6,R0,#0               
+              AND      R5,R5,#0               ; R5 means the right or wrong location
+              ADD      R5,R5,#1               
+              BRnzp    BACK2                  ; If match, right location
+
+NEXTLINE      ADD      R0,R0,#-6
+              ADD      R3,R3,#-1
+              BRnz     BACK
+              BRnzp    CheckNext              ; If match, jump to check next line
+             
+BACK          AND      R5,R5,#0
+BACK2         LD       R1,SaveR1
+              LD       R2,SaveR2
+              LD       R3,SaveR3
+              LD       R7,SaveR07
+              RET 
+;
+;
+; Output the ChessBoard.             
+OUTCB         ST       R0,SaveR00
+              ST       R1,SaveR1
+              ST       R2,SaveR2
+              ST       R3,SaveR3
+              ST       R7,SaveR07
+
+              AND      R1,R1,#0               ; Clear R1
+              AND      R2,R2,#0               ; Clear R2
+              LD       R1,THIRDSIX            ; R1 is a counter, initialize to 36
+              LD       R3,ChessBoard
+NEXT3         ADD      R3,R3,#1               ; R3 is a counter for newline 
+              LDR      R0,R3,#-1
+              BRp      O
+              BRz      NULL                   
+              BRn      X 
+O             JSR      OUTO                   ; If postive, output 'O'
+              BRnzp    NEXT
+NULL          JSR      OUTNull                ; If zero, output '-'
+              BRnzp    NEXT
+X             JSR      OUTX                   ; If negtive, output 'O'
+NEXT          ADD      R2,R2,#1               ; Increment count
+              ADD      R0,R2,#-6
+              BRz      NewLine
+              JSR      OUTSpace               ; If match, output ' '
+              BRnzp    NEXT2
+NewLine       AND      R2,R2,#0               ; Clear R2
+              JSR      OUTNewLine     
+NEXT2         ADD      R1,R1,#-1              ; Discrement count
+              BRp      NEXT3   
+
+              LD       R0,SaveR00
+              LD       R1,SaveR1
+              LD       R2,SaveR2
+              LD       R3,SaveR3
+              LD       R7,SaveR07          
+              RET
+;
+;
+;WIN OR FAIL. If win, R3=1, else R3=0; R6 represent the PLAY1 or PLAY2.R0 is the location.
+IFWIN         ST       R1,SaveR11
+              ST       R2,SaveR22
+              ST       R4,SaveR44
+              ST       R5,SaveR55
+              ST       R6,SaveR66 
+              ST       R7,SaveR77 
+    
+              AND      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              AND      R3,R3,#0               ; Clear R3
+              AND      R4,R4,#0               ; Clear R4
+              AND      R2,R2,#0               ; Clear R2
+              ADD      R7,R0,#0
+;Calculate the coordinate position. R2 for list. R4 for row.
+              LD       R5,LOAC                ; Load R5 -x4000
+              ADD      R5,R7,R5
+DELETE6       ADD      R5,R5,#-6
+              BRn      ROWSUM
+              ADD      R4,R4,#1               ; R4 to count for row
+              BRnzp    DELETE6
+ROWSUM        ADD      R2,R5,#6               ; R2 to count for list
+              ST       R4,SaveROW             ; Save the data of row.
+              ST       R2,Savelist            ; Save the data of list.
+              
+              NOT      R6,R6
+              ADD      R6,R6,#1               ; If add -R6 to zero, match
+; Up-column              
+CHECKNEXT     ADD      R4,R4,#-1              ; To check whether it's flow or not
+              BRn      DIRECTION
+              ADD      R7,R7,#-6          
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     DIRECTION
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT
+; Down-column              
+DIRECTION     LD       R4,SaveROW
+              ADD      R7,R0,#0               ; Initialize the R7
+CHECKNEXT1    ADD      R4,R4,#1               ; To check whether it's flow or not
+              BRn      JUDGEFOUR
+              ADD      R7,R7,#6
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     JUDGEFOUR
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT1
+
+JUDGEFOUR     ADD      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      CROW                   ; Else to check the next group  
+              ADD      R3,R3,#1
+              BRnzp    SOMEONEWIN         
+
+CROW          AND      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+CHECKNEXT2    ADD      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      CROW1
+              ADD      R7,R7,#-1
+              LDR      R5,R7,#0
+              ADD      R5,R6,R5
+              BRnp     CROW1
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    CHECKNEXT2
+
+CROW1         ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+CHECKNEXT3    ADD      R2,R2,#1               ; To check whether it's flow or not
+              ADD      R5,R2,#-6
+              BRzp     JUDGEFOUR2     
+              ADD      R7,R7,#1
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     JUDGEFOUR2
+              ADD      R1,R1,#1               ; If match, increment count 
+              BRnzp    CHECKNEXT3 
+
+JUDGEFOUR2    ADD      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      INCLINED               ; Else to check the next group
+              ADD      R3,R3,#1
+              BRnzp    SOMEONEWIN  
+
+INCLINED      AND      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+              LD       R4,SaveROW
+              
+NEXTINCL      ADD      R4,R4,#-1              ; To check whether it's flow or not
+              BRn      INCLINED2
+              ADD      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      INCLINED2
+              ADD      R7,R7,#-7
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     INCLINED2
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTINCL
+
+INCLINED2     ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+              LD       R4,SaveROW
+
+NEXTINCL1     ADD      R4,R4,#1               ; To check whether it's flow or not
+              ADD      R5,R4,#-6
+              BRzp     JUDGEFOUR3 
+              ADD      R2,R2,#1               ; To check whether it's flow or not
+              ADD      R5,R2,#-6 
+              BRzp     JUDGEFOUR3
+              ADD      R7,R7,#7
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     JUDGEFOUR3
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTINCL1 
+  
+JUDGEFOUR3    ADD      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      BIAS                   ; Else to check the next group 
+              ADD      R3,R3,#1
+              BRnzp    SOMEONEWIN  
+
+BIAS          AND      R1,R1,#0               ; R1 is a counter for four, initialize to 0
+              ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+              LD       R4,SaveROW
+              
+NEXTBIAS      ADD      R4,R4,#1               ; To check whether it's flow or not
+              ADD      R5,R4,#-6
+              BRzp     NEXTBIAS2
+              ADD      R2,R2,#-1              ; To check whether it's flow or not
+              BRn      NEXTBIAS2
+              ADD      R7,R7,#5
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     NEXTBIAS2
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTBIAS
+
+NEXTBIAS2     ADD      R7,R0,#0               ; Initialize the R7
+              LD       R2,Savelist
+              LD       R4,SaveROW
+
+NEXTBIAS1     ADD      R4,R4,#-1              ; To check whether it's flow or not
+              BRn      JUDGEFOUR4
+              ADD      R2,R2,#1               ; To check whether it's flow or not
+              ADD      R5,R2,#-6
+              BRzp     JUDGEFOUR4
+              ADD      R7,R7,#-5
+              LDR      R5,R7,#0
+              ADD      R5,R5,R6
+              BRnp     JUDGEFOUR4
+              ADD      R1,R1,#1               ; If match, increment count
+              BRnzp    NEXTBIAS1 
+  
+JUDGEFOUR4    ADD      R5,R1,#-3              ; If R5>=3, someone wins the game
+              BRn      SOMEONEWIN             ; Else end this subprogram
+              ADD      R3,R3,#1
+              BRnzp    SOMEONEWIN 
+               
+
+SOMEONEWIN    LD       R1,SaveR11
+              LD       R2,SaveR22
+              LD       R4,SaveR44
+              LD       R5,SaveR55
+              LD       R6,SaveR66
+              LD       R7,SaveR77
+              RET 
+;
+SaveR11        .FILL    #0
+SaveR22        .FILL    #0
+SaveR44        .FILL    #0
+SaveR55        .FILL    #0
+SaveR66        .FILL    #0
+SaveR77        .FILL    #0
+
+Savelist       .FILL    #0
+SaveROW        .FILL    #0  
+LOAC           .FILL    xC001
+;
+
+                .END
