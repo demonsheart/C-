@@ -78,3 +78,32 @@ int main()
 
     return 0;
 }
+/*
+题目描述
+用CPoint表示点，用两个CPoint对象表示矩形类CRect的对角线两点。分别实现CPoint类和CRect类，并在主函数用输入的坐标定义4个CPoint类对象，每2个CPoint对象再构造1个CRect对象，然后写个友元函数，判断2个矩形是否重叠。
+
+输入
+判断次数
+
+矩形1的对角线顶点坐标x1, y1, x2, y2
+
+矩形2的对角线顶点坐标x1, y1, x2, y2
+
+......
+
+输出
+ 是否重叠
+
+样例输入
+3
+1 5 2 9
+1 3 2 4
+5 6 7 8
+5 7 7 7
+2 5 1 0
+9 4 2 9
+样例输出
+not overlapped
+overlapped
+overlapped
+*/

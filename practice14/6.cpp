@@ -122,17 +122,17 @@ int main()
     double money, interest;
     char op_code;
 
-    //è¾“å…¥æµ‹è¯•æ¡ˆä¾‹æ•°t
+    //ÊäÈë²âÊÔ°¸ÀıÊıt
     cin >> t;
     while (t--)
     {
-        //è¾“å…¥äº’è”ç½‘ç”¨æˆ·æ³¨å†Œæ—¶çš„ç”¨æˆ·å,id,ç™»é™†å¯†ç 
+        //ÊäÈë»¥ÁªÍøÓÃ»§×¢²áÊ±µÄÓÃ»§Ãû,id,µÇÂ½ÃÜÂë
         cin >> i_xm >> i_id >> i_mm;
 
-        //è¾“å…¥é“¶è¡Œå¼€æˆ·ç”¨æˆ·å,id
+        //ÊäÈëÒøĞĞ¿ª»§ÓÃ»§Ãû,id
         cin >> b_xm >> b_id;
 
-        //è¾“å…¥äº’è”ç½‘ç”¨æˆ·ç™»é™†æ—¶çš„id,ç™»é™†å¯†ç 
+        //ÊäÈë»¥ÁªÍøÓÃ»§µÇÂ½Ê±µÄid,µÇÂ½ÃÜÂë
         cin >> ib_id >> ib_mm;
 
         CInternetBankCustomer ib_user;
@@ -140,21 +140,21 @@ int main()
         ib_user.registerUser(i_xm, i_id, i_mm);
         ib_user.openAccount(b_xm, b_id);
 
-        if (ib_user.login(ib_id, ib_mm) == 0) //äº’è”ç½‘ç”¨æˆ·ç™»é™†,è‹¥idä¸å¯†ç ä¸ç¬¦;ä»¥åŠé“¶è¡Œå¼€æˆ·å§“åå’Œidä¸äº’è”ç½‘å¼€æˆ·å§“åå’Œidä¸åŒ
+        if (ib_user.login(ib_id, ib_mm) == 0) //»¥ÁªÍøÓÃ»§µÇÂ½,ÈôidÓëÃÜÂë²»·û;ÒÔ¼°ÒøĞĞ¿ª»§ĞÕÃûºÍidÓë»¥ÁªÍø¿ª»§ĞÕÃûºÍid²»Í¬
         {
             cout << "Password or ID incorrect" << endl;
             continue;
         }
 
-        //è¾“å…¥å¤©æ•°
+        //ÊäÈëÌìÊı
         cin >> no_of_days;
         for (i = 0; i < no_of_days; i++)
         {
-            //è¾“å…¥æ“ä½œä»£ç , é‡‘é¢, å½“æ—¥ä¸‡å…ƒæ”¶ç›Š
+            //ÊäÈë²Ù×÷´úÂë, ½ğ¶î, µ±ÈÕÍòÔªÊÕÒæ
             cin >> op_code >> money >> interest;
             switch (op_code)
             {
-            case 'S': //ä»é“¶è¡Œå‘äº’è”ç½‘é‡‘èå¸æˆ·å­˜å…¥
+            case 'S': //´ÓÒøĞĞÏò»¥ÁªÍø½ğÈÚÕÊ»§´æÈë
             case 's':
                 if (ib_user.deposit(money) == 0)
                 {
@@ -162,7 +162,7 @@ int main()
                     continue;
                 }
                 break;
-            case 'T': //ä»äº’è”ç½‘é‡‘èè½¬å…¥é“¶è¡Œå¸æˆ·
+            case 'T': //´Ó»¥ÁªÍø½ğÈÚ×ªÈëÒøĞĞÕÊ»§
             case 't':
                 if (ib_user.withdraw(money) == 0)
                 {
@@ -170,11 +170,11 @@ int main()
                     continue;
                 }
                 break;
-            case 'D': //ç›´æ¥å‘é“¶è¡Œå¸æˆ·å­˜æ¬¾
+            case 'D': //Ö±½ÓÏòÒøĞĞÕÊ»§´æ¿î
             case 'd':
                 ib_user.CBankCustome::deposit(money);
                 break;
-            case 'W': //ç›´æ¥ä»é“¶è¡Œå¸æˆ·å–æ¬¾
+            case 'W': //Ö±½Ó´ÓÒøĞĞÕÊ»§È¡¿î
             case 'w':
                 if (ib_user.CBankCustome::withdraw(money) == 0)
                 {
@@ -188,11 +188,156 @@ int main()
             }
             ib_user.setInterest(interest);
             ib_user.calculateProfit();
-            //è¾“å‡ºç”¨æˆ·å,id
-            //è¾“å‡ºé“¶è¡Œä½™é¢
-            //è¾“å‡ºäº’è”ç½‘é‡‘èè´¦æˆ·ä½™é¢
+            //Êä³öÓÃ»§Ãû,id
+            //Êä³öÒøĞĞÓà¶î
+            //Êä³ö»¥ÁªÍø½ğÈÚÕË»§Óà¶î
             ib_user.print();
         }
     }
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+¶¨ÒåÒ»¸öÀàCPeople£¬¾ßÓĞÉí·İºÅÂë(id,char[20])ºÍĞÕÃû(name,char[10])Á½¸öÊı¾İ³ÉÔ±£¬´ÓCPeopleÀàÖĞÔÙÅÉÉú³öCInternetUserÀàºÍCBankCustomerÀà£¬È»ºóÔÙ´ÓCInternetUserºÍCBankCustomer¶àÖØ¼Ì³ĞÅÉÉú³öCInternetBankCustomerÀà¡£
+
+CInternetUserÀàÓĞµÇÂ¼ÃÜÂë(password,char[20])ÊôĞÔºÍ×¢²áregister(ÉèÖÃid, nameºÍpassword)£¬µÇÂ¼login(ÅĞ¶ÏÊäÈëµÄidÓëpasswordÊÇ·ñÓë¶ÔÏó×¢²áµÄÏàÍ¬)³ÉÔ±º¯Êı¡£
+
+CBankCustomerÀàÓĞÓà¶î(balance,double)ÊôĞÔºÍ¿ª»§openAccount(ÉèÖÃ¿Í»§ĞÕÃûºÍid)£¬´æ¿îdeposit£¬È¡¿îwithdrawÒÔ¼°È±Ê¡µÄ¹¹Ôìº¯Êı¡£
+
+CInternetBankCustomerÀà°üÀ¨ÓĞÓà¶î, Ç°Ò»ÈÕÓà¶î, µ±ÈÕÊÕÒæ£¬½ñÈÕÍòÔªÊÕÒæºÍÉÏÒ»ÈÕÍòÔªÊÕÒæµÈ5¸öÊı¾İ³ÉÔ±£¬³ÉÔ±º¯ÊıÓĞÈ±Ê¡¹¹Ôìº¯Êı£¬´æ¿îºÍÈ¡¿î£¬ÉèÖÃÍòÔªÊÕÒæ£¬¼ÆËãµ±ÈÕÊÕÒæ£¬µÇÂ½login(ÅĞ¶ÏÊäÈëµÄidºÍÃÜÂëÊÇ·ñÓë»¥ÁªÍøÓÃ»§µÄÏàÍ¬£¬Í¬Ê±´ÓCBankCustomer¼Ì³ĞµÄÓÃ»§ĞÕÃûºÍidÒªÓë´ÓCInternetUser¼Ì³ĞµÄÏàÍ¬)¡£CInternetBankCustomerÀà¶ÔÏóµ±ÈÕ´æ¿î²»¼ÆËãÊÕÒæ£¬µÚ2Ìì¿ªÊ¼²ÅÄÜ¼ÆËãÊÕÒæ£¬µ±ÈÕÈ¡¿î²¿·ÖÎŞÊÕÒæ¡£
+
+  ¿É²ÎÕÕÈçÏÂËùÊ¾µÄÖ÷º¯ÊıÀ´²âÊÔ²¢Éè¼ÆÊäÈëÊı¾İ£º
+
+void main()
+{
+int t, no_of_days, i;
+char i_xm[20], i_id[20], i_mm[20], b_xm[20], b_id[20], ib_id[20], ib_mm[20];
+double money, interest;
+char op_code;
+
+//ÊäÈë²âÊÔ°¸ÀıÊıt
+     cin >> t;
+     while (t--)
+     {
+//ÊäÈë»¥ÁªÍøÓÃ»§×¢²áÊ±µÄÓÃ»§Ãû,id,µÇÂ½ÃÜÂë
+        cin >> i_xm >> i_id >> i_mm;
+
+//ÊäÈëÒøĞĞ¿ª»§ÓÃ»§Ãû,id
+        cin >> b_xm >> b_id;
+
+//ÊäÈë»¥ÁªÍøÓÃ»§µÇÂ½Ê±µÄid,µÇÂ½ÃÜÂë
+        cin >> ib_id >> ib_mm;
+
+  CInternetBankCustomer ib_user;
+
+      ib_user.registerUser(i_xm, i_id, i_mm);
+      ib_user.openAccount(b_xm, b_id);
+
+      if (ib_user.login(ib_id, ib_mm) == 0)  //»¥ÁªÍøÓÃ»§µÇÂ½,ÈôidÓëÃÜÂë²»·û;ÒÔ¼°ÒøĞĞ¿ª»§ĞÕÃûºÍidÓë»¥ÁªÍø¿ª»§ĞÕÃûºÍid²»Í¬
+     {
+         cout << "Password or ID incorrect" << endl;
+         continue;
+      }
+
+//ÊäÈëÌìÊı
+      cin >> no_of_days;
+      for (i=0; i < no_of_days; i++)
+     {
+      //ÊäÈë²Ù×÷´úÂë, ½ğ¶î, µ±ÈÕÍòÔªÊÕÒæ
+          cin >> op_code >> money >> interest;
+          switch (op_code)
+         {
+            case 'S':  //´ÓÒøĞĞÏò»¥ÁªÍø½ğÈÚÕÊ»§´æÈë
+            case 's':
+               if (ib_user.deposit(money) == 0)
+               {
+                  cout << "Bank balance not enough" << endl;
+                  continue;
+               }
+               break;
+          case 'T':  //´Ó»¥ÁªÍø½ğÈÚ×ªÈëÒøĞĞÕÊ»§
+          case 't':
+              if (ib_user.withdraw(money) == 0)
+             {
+                 cout << "Internet bank balance not enough" << endl;
+                 continue;
+             }
+             break;
+          case 'D':  //Ö±½ÓÏòÒøĞĞÕÊ»§´æ¿î
+          case 'd':
+               ib_user.CBankCustomer::deposit(money);
+              break;
+          case 'W':  //Ö±½Ó´ÓÒøĞĞÕÊ»§È¡¿î
+           case 'w':
+               if (ib_user.CBankCustomer::withdraw(money) == 0)
+              {
+                    cout << "Bank balance not enough" << endl;
+                   continue;
+              }
+              break;
+          default:
+                cout << "Illegal input" << endl;
+               continue;
+         }
+          ib_user.setInterest(interest);
+          ib_user.calculateProfit();
+//Êä³öÓÃ»§Ãû,id
+//Êä³öÒøĞĞÓà¶î
+//Êä³ö»¥ÁªÍø½ğÈÚÕË»§Óà¶î
+          ib_user.print();
+      }
+   }
+}
+
+ÊäÈë
+ÊäÈëÓÃ»§ÀıÊı
+
+ÊäÈëµÚ1¸ö»¥ÁªÍøÓÃ»§×¢²áÊ±µÄÓÃ»§Ãû,id,µÇÂ½ÃÜÂë
+
+ÊäÈëµÚ1¸öÓÃ»§ÒøĞĞ¿ª»§ÓÃ»§Ãû,id
+
+ÊäÈëµÚ1¸ö»¥ÁªÍøÓÃ»§µÇÂ½Ê±µÄid,µÇÂ½ÃÜÂë
+
+ÊäÈëµÚ1¸öÓÃ»§²Ù×÷ÌìÊı
+
+Ñ­»·ÊäÈë²Ù×÷´úÂë(S,T,D,W)  ½ğ¶î  µ±ÈÕÍòÔªÊÕÒæ
+......
+
+Êä³ö
+Êä³öµÚ1¸öÓÃ»§Ãû,id
+Êä³öµÚ1¸öÓÃ»§ÒøĞĞÓà¶î
+Êä³öµÚ1¸ö»¥ÁªÍø½ğÈÚÕË»§Óà¶î
+......
+
+ÑùÀıÊäÈë
+2
+zhangsan 1234567890 222222
+zhangsan 1234567890
+1234567890 222222
+4
+D 15000 0
+s 8000 1.5
+T 3000 1.55
+w 2000 0
+lisi 2014150000 abcdef
+lisi 2014150000
+2014150000 123456
+ÑùÀıÊä³ö
+Name: zhangsan ID: 1234567890
+Bank balance: 15000
+Internet bank balance: 0
+
+Name: zhangsan ID: 1234567890
+Bank balance: 7000
+Internet bank balance: 8000
+
+Name: zhangsan ID: 1234567890
+Bank balance: 10000
+Internet bank balance: 5001.2
+
+Name: zhangsan ID: 1234567890
+Bank balance: 8000
+Internet bank balance: 5001.98
+
+Password or ID incorrect
+*/

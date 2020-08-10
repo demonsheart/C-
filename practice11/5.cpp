@@ -24,7 +24,7 @@ public:
         if (value == max_value)
         {
             value = min_value;
-            return true; //éœ€è¦è¿›ä½
+            return true; //ÐèÒª½øÎ»
         }
         else
         {
@@ -65,3 +65,39 @@ int main()
     }
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+¶¨Òå¼ÆÊýÆ÷Àà£¬°üº¬±£»¤Êý¾Ý³ÉÔ±value,¹«ÓÐº¯Êýincrement¼ÆÊý¼Ó1¡£
+
+¶¨ÒåÑ­»·¼ÆËãÆ÷¼Ì³Ð¼ÆÊýÆ÷Àà£¬Ôö¼ÓË½ÓÐÊý¾Ý³ÉÔ±£º×îÐ¡Öµmin_value£¬max_value,
+
+ÖØÐ´¹«ÓÐº¯Êýincrement£¬Ê¹µÃvalueÔÚmin_value~max_valueÇø¼äÄÚÑ­»·+1¡£
+
+¶¨ÒåÊ±ÖÓÀà£¬Êý¾Ý³ÉÔ±ÊÇË½ÓÐÑ­»·¼ÆÊýÆ÷¶ÔÏóÐ¡Ê±hour¡¢·ÖÖÓminute¡¢Ãësecond£¬¹«ÓÐº¯Êýtime(int s)¼ÆËãµ±Ç°Ê±¼ä¾­¹ýsÃëÖ®ºóµÄÊ±¼ä£¬¼´hour,minute,secondµÄÐÂvalueÖµ¡£
+
+¶¨ÒåÊ±ÖÓÀà¶ÔÏó£¬ÊäÈëµ±Ç°Ê±¼äºÍ¾­¹ýµÄÃëÊý,µ÷ÓÃtimeº¯Êý¼ÆËãÐÂÊ±¼ä¡£
+
+¸ù¾ÝÌâÄ¿ÒªÇó£¬Ôö¼Ó±ØÒªµÄ¹¹Ôìº¯Êý¡¢Îö¹¹º¯ÊýºÍÆäËûËùÐèº¯Êý¡£
+
+ÒòÎªclockÊÇÏµÍ³ÄÚÖÃº¯Êý£¬ÎªÁË±ÜÃâÖØÃû£¬Çë²»ÒªÊ¹ÓÃclock×÷ÎªÀàÃû»òÕßº¯ÊýÃû
+
+ÊäÈë
+µÚÒ»ÐÐ²âÊÔ´ÎÊýn
+
+2ÐÐÒ»×é£¬µÚÒ»ÐÐÎªµ±Ç°Ê±¼ä£¨Ð¡Ê± ·ÖÖÓ Ãë£©£¬µÚ¶þÐÐÎª¾­¹ýµÄÃëÊý¡£
+
+Êä³ö
+Êä³önÐÐ
+
+Ã¿ÐÐ¶ÔÓ¦Ã¿×éµ±Ç°Ê±¼äºÍ¾­¹ýÃëÊýºó¼ÆËãµÃµ½µÄÐÂÊ±¼ä£¨Ð¡Ê±£º·ÖÖÓ£ºÃë£©¡£
+
+ÑùÀýÊäÈë
+2
+8 19 20
+20
+23 30 0
+1801
+ÑùÀýÊä³ö
+8:19:40
+0:0:1
+*/

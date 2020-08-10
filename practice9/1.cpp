@@ -3,10 +3,10 @@ using namespace std;
 class Student
 {
 private:
-    int id;              //å­¦å·
-    int score;           //æˆç»©
-    static int maxscore; //æœ€é«˜åˆ†æ•°
-    static int maxid;    //æœ€é«˜åˆ†æ•°å­¦ç”Ÿå­¦å·
+    int id;              //Ñ§ºÅ
+    int score;           //³É¼¨
+    static int maxscore; //×î¸ß·ÖÊı
+    static int maxid;    //×î¸ß·ÖÊıÑ§ÉúÑ§ºÅ
 public:
     Student(int ti = 0, int ts = 0)
         : id(ti), score(ts)
@@ -39,12 +39,44 @@ int main()
     for (int i = 0; i < n; i++)
     {
         cin >> ti >> ts;
-        s[i] = new Student(ti,ts);
+        s[i] = new Student(ti, ts);
     }
     for (int i = 0; i < n; i++)
         Student::findMax(*s[i]);
     cout << Student::getMaxID() << "--" << Student::getMaxScore();
     for (int i = 0; i < n; i++)
-     delete [] s[i];
+        delete[] s[i];
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+Ñ§ÉúÀà¶¨ÒåÈçÏÂ£º
+class Student {
+private:
+	int id;	//Ñ§ºÅ
+	int score; //³É¼¨
+	static int  maxscore;	//×î¸ß·ÖÊı
+	static int maxid;		//×î¸ß·ÖÊıÑ§ÉúÑ§ºÅ
+public:
+	Student(int ti=0,	int ts=0)
+		:id(ti), score(ts)
+    {}
+	static void findMax(Student & st); //Ñ°ÕÒ×î¸ß³É¼¨ºÍÑ§ºÅ
+	static int getMaxScore(); //·µ»Ø×î¸ß³É¼¨
+	static int getMaxID();		//·µ»Ø×î¸ß³É¼¨µÄÑ§ºÅ
+};
+ÊäÈëÒ»×éÑ§ÉúÑ§ºÅºÍ³É¼¨£¬ÓÃÉÏÊö¾²Ì¬³ÉÔ±Çó×î¸ß³É¼¨ºÍ¶ÔÓ¦Ñ§ºÅ
+ÊäÈë
+µÚÒ»ĞĞÊäÈën±íÊ¾ÓĞn¸öÑ§Éú
+½Ó×ÅÊäÈënĞĞ£¬Ã¿ĞĞ°üÀ¨Á½¸öÊı¾İ£¬±íÊ¾Ñ§ºÅºÍ³É¼¨
+Êä³ö
+µ÷ÓÃ¾²Ì¬³ÉÔ±º¯ÊıÊä³öÑ§ºÅºÍ×î¸ß³É¼¨£¬¸ñÊ½¿´ÑùÀı
+
+ÑùÀıÊäÈë
+3
+1002 68
+1023 54
+1045 32
+ÑùÀıÊä³ö
+1002--68
+*/

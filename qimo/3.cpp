@@ -14,12 +14,12 @@ T max(T t[], int len)
 template <class T>
 class Cryption
 {
-    T ptxt[100]; //æ˜Žæ–‡
-    T ctxt[100]; //å¯†æ–‡
-    T key;       //å¯†é’¥
-    int len;     //é•¿åº¦
+    T ptxt[100]; //Ã÷ÎÄ
+    T ctxt[100]; //ÃÜÎÄ
+    T key;       //ÃÜÔ¿
+    int len;     //³¤¶È
 public:
-    Cryption(T tk, T tt[], int tl) : key(tk), len(tl) //å‚æ•°ä¾æ¬¡å¯¹åº”å¯†é’¥ã€æ˜Žæ–‡ã€é•¿åº¦
+    Cryption(T tk, T tt[], int tl) : key(tk), len(tl) //²ÎÊýÒÀ´Î¶ÔÓ¦ÃÜÔ¿¡¢Ã÷ÎÄ¡¢³¤¶È
     {
         for (int i = 0; i < len; ++i)
             ptxt[i] = tt[i];
@@ -32,7 +32,7 @@ public:
             ctxt[i] = ma - ptxt[i] + key;
         }
     }
-    void Print() //æ‰“å°ï¼Œæ— éœ€æ”¹é€ 
+    void Print() //´òÓ¡£¬ÎÞÐè¸ÄÔì
     {
         int i;
         for (i = 0; i < len - 1; i++)
@@ -40,29 +40,29 @@ public:
         cout << ctxt[i] << endl;
     }
 };
-//æ”¯æŒä¸‰ç§ç±»åž‹çš„ä¸»å‡½æ•°
+//Ö§³ÖÈýÖÖÀàÐÍµÄÖ÷º¯Êý
 int main()
 {
     int i;
-    int length; //é•¿åº¦
+    int length; //³¤¶È
     int ik, itxt[100];
     double dk, dtxt[100];
     char ck, ctxt[100];
-    //æ•´æ•°åŠ å¯†
+    //ÕûÊý¼ÓÃÜ
     cin >> ik >> length;
     for (i = 0; i < length; i++)
         cin >> itxt[i];
     Cryption<int> ic(ik, itxt, length);
     ic.Encrypt();
     ic.Print();
-    //æµ®ç‚¹æ•°åŠ å¯†
+    //¸¡µãÊý¼ÓÃÜ
     cin >> dk >> length;
     for (i = 0; i < length; i++)
         cin >> dtxt[i];
     Cryption<double> dc(dk, dtxt, length);
     dc.Encrypt();
     dc.Print();
-    //å­—ç¬¦åŠ å¯†
+    //×Ö·û¼ÓÃÜ
     cin >> ck >> length;
     for (i = 0; i < length; i++)
         cin >> ctxt[i];
@@ -72,3 +72,91 @@ int main()
 
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+¼ÓÃÜ»úÖÆ°üÀ¨Ã÷ÎÄ¡¢ÃÜÎÄ¡¢ÃÜÔ¿¡£ÓÃÃÜÔ¿¶ÔÃ÷ÎÄ½øÐÐ¼ÓÃÜºó¾ÍµÃµ½ÃÜÎÄ¡£
+ÔÚ¹Åµä¼ÓÃÜ»úÖÆÖÐ£¬Æ«ÀëÖµÊÇÒ»ÖÖ³£¼ûµÄ·½·¨£¬¼ÓÃÜ¹ý³ÌÎª
+1¡¢ÔÚÒÑÖªÊý¾ÝÖÐÕÒ³ö×î´óÖµ
+2¡¢ÓÃ×î´óÖµ¼õÈ¥¸÷¸öÊýÖµ£¬µÃµ½ÏàÓ¦µÄÆ«ÀëÖµ
+3¡¢Æ«ÀëÖµ¼ÓÉÏÃÜÔ¿¾ÍµÃµ½ÃÜÎÄ
+ÀýÈçÃ÷ÎÄÎª1 2 3 4 5£¬ÃÜÔ¿ÊÇ10£¬¼ÓÃÜ¹ý³ÌÎª£º
+1¡¢ÕÒ³öÃ÷ÎÄµÄ×î´óÖµÊÇ5
+2¡¢ÓÃ5¼õÈ¥Ã÷ÎÄµÄ¸÷¸öÊýÖµ£¬µÃµ½Æ«ÀëÖµ4 3 2 1 0
+3¡¢ÓÃÆ«ÀëÖµ¼ÓÉÏÃÜÔ¿£¬µÃµ½ÃÜÎÄ14 13 12 11 10
+¶¨ÒåÒ»¸öº¯ÊýÄ£°å£¬ÃûÎªmax£¬²ÎÊý°üÀ¨Êý×éºÍÊý×é³¤¶È£¬·µ»ØÖµÊÇÊý×éÖÐµÄ×î´óÖµ£¬ÒªÇóÖ§³ÖÕûÊý¡¢¸¡µãÊýºÍ×Ö·ûÈýÖÖÀàÐÍ¡£
+
+ÓÃÀàÄ£°å¶¨ÒåÒ»¸ö¼ÓÃÜÀà£¬°üº¬ËÄ¸öÊôÐÔ£ºÃ÷ÎÄ¡¢ÃÜÎÄ¡¢ÃÜÔ¿¡¢³¤¶È£¬Ç°Èý¸öÊôÐÔ¶¼ÊÇÍ¬Ò»ÖÖÀàÐÍ£¬³¤¶ÈÊÇÕûÊý¡£³¤¶ÈÊÇÖ¸Ã÷ÎÄµÄ³¤¶È¡£
+ÀàÄ£°å°üº¬²Ù×÷¹¹Ôì¡¢¼ÓÃÜ¡¢´òÓ¡£¬ËµÃ÷ÈçÏÂ£º
+1¡¢¼ÓÃÜÊÇµ÷ÓÃº¯ÊýÄ£°åmaxµÃµ½Êý×é×î´óÖµ£¬°´ÕÕÇ°ÃæµÄ·½·¨Ê¹ÓÃ×î´óÖµºÍÃÜÔ¿½øÐÐ¼ÓÃÜ£¬µÃµ½ÃÜÎÄ
+2¡¢´òÓ¡ÊÇÊä³öÃÜÎÄ
+ÒªÇóÀàÄ£°åÖ§³ÖÕûÊý¡¢¸¡µãÊýºÍ×Ö·ûÈýÖÖÀàÐÍ¡£
+²Î¿¼´úÂë¸ø³öÁË¼ÓÃÜÀà½çÃæ£¨Ö»Ö§³ÖÕûÊýÀàÐÍ£©¡¢Ö÷º¯Êý£¨Ö§³ÖÈýÖÖÊý¾ÝÀàÐÍ£©£¬³ÌÐòÒªÇó
+1¡¢¸ù¾ÝÒªÇó±àÐ´º¯ÊýÄ£°åmax
+2¡¢Ê¹ÓÃÀàÄ£°å·½·¨¸ÄÔì¼ÓÃÜÀà½çÃæ£¬²»ÄÜÔö¼ÓÈÎºÎÊôÐÔºÍ²Ù×÷£¬±ØÐëÔÚÀàÍâÊµÏÖ¹¹Ôìº¯ÊýºÍ¼ÓÃÜ·½·¨
+3¡¢Ö÷º¯Êý²»ÄÜÓÐÈÎºÎÐÞ¸Ä
+ÉÏÊöËùÓÐÀàÊôÐÔ¶¼²»ÊÇpublic£¬ÓÃÃæÏò¶ÔÏóË¼ÏëºÍC++ÓïÑÔÊµÏÖÉÏÊöÒªÇó
+----²Î¿¼´úÂë----
+
+//Ö»Ö§³ÖÕûÊýÀàÐÍµÄ¼ÓÃÜÀà½çÃæ
+class Cryption { 
+	int ptxt[100];	//Ã÷ÎÄ
+	int ctxt[100];	//ÃÜÎÄ
+	int key;	//ÃÜÔ¿
+	int len;	//³¤¶È
+public:
+	Cryption(int tk, int tt[], int tl); //²ÎÊýÒÀ´Î¶ÔÓ¦ÃÜÔ¿¡¢Ã÷ÎÄ¡¢³¤¶È
+	void Encrypt(); //¼ÓÃÜ
+	void Print() //´òÓ¡£¬ÎÞÐè¸ÄÔì
+	{	int i;
+		for (i=0; i<len-1; i++)
+			cout<<ctxt[i]<<" ";
+		cout<<ctxt[i]<<endl;
+	}
+};
+//Ö§³ÖÈýÖÖÀàÐÍµÄÖ÷º¯Êý
+int main()
+{	int i;
+	int length; //³¤¶È
+	int ik, itxt[100];
+	double dk, dtxt[100];
+	char ck, ctxt[100];
+	//ÕûÊý¼ÓÃÜ
+	cin>>ik>>length;
+	for (i=0; i<length; i++)
+		cin>>itxt[i];
+	Cryption<int> ic(ik, itxt, length);
+	ic.Encrypt();
+	ic.Print();
+	//¸¡µãÊý¼ÓÃÜ
+	cin>>dk>>length;
+	for (i=0; i<length; i++)
+		cin>>dtxt[i];
+	Cryption<double> dc(dk, dtxt, length);
+	dc.Encrypt();
+	dc.Print();
+	//×Ö·û¼ÓÃÜ
+	cin>>ck>>length;
+	for (i=0; i<length; i++)
+		cin>>ctxt[i];
+	Cryption<char> cc(ck, ctxt, length);
+	cc.Encrypt();
+	cc.Print();
+	
+	return 0;
+}
+ÊäÈë
+µÚÒ»ÐÐÊäÈëÕûÊýÀàÐÍµÄÐÅÏ¢£¬°üÀ¨ÃÜÔ¿¡¢³¤¶È¡¢Ã÷ÎÄ
+µÚ¶þÐÐÊäÈë¸¡µãÊýÀàÐÍµÄÐÅÏ¢£¬°üÀ¨ÃÜÔ¿¡¢³¤¶È¡¢Ã÷ÎÄ
+µÚÈýÐÐÊäÈë×Ö·ûÀàÐÍµÄÐÅÏ¢£¬°üÀ¨ÃÜÔ¿¡¢³¤¶È¡¢Ã÷ÎÄ
+Êä³ö
+ÈýÐÐ·Ö±ðÊä³öÈýÖÖÀàÐÍµÄÃÜÎÄ
+
+ÑùÀýÊäÈë
+10 5 1 2 3 4 5
+11.11 4 1.1 2.2 3.3 4.4
+O 3 a b c
+ÑùÀýÊä³ö
+14 13 12 11 10
+14.41 13.31 12.21 11.11
+Q P O
+*/

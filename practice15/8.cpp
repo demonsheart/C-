@@ -60,14 +60,14 @@ ostream &operator<<(ostream &out, const CBigInt &b)
 CBigInt operator+(CBigInt &r1, CBigInt &r2)
 {
     string tem;
-    if (r1.flag ^ r2.flag) //å¼‚å·
+    if (r1.flag ^ r2.flag) //ÒìºÅ
     {
-        if (r1.flag) //r1ä¸ºè´Ÿ
+        if (r1.flag) //r1Îª¸º
             tem = sub(r2.num, r1.num);
         else
             tem = sub(r1.num, r2.num);
     }
-    else //åŒå·
+    else //Í¬ºÅ
     {
         tem = add(r1.num, r2.num);
         if (r1.flag == 1)
@@ -78,9 +78,9 @@ CBigInt operator+(CBigInt &r1, CBigInt &r2)
 CBigInt operator-(CBigInt &r1, CBigInt &r2)
 {
     string tem;
-    if (r1.flag ^ r2.flag) //å¼‚å·
+    if (r1.flag ^ r2.flag) //ÒìºÅ
     {
-        if (r1.flag) //r1ä¸ºè´Ÿ
+        if (r1.flag) //r1Îª¸º
         {
             tem = add(r2.num, r1.num);
             tem = '-' + tem;
@@ -88,7 +88,7 @@ CBigInt operator-(CBigInt &r1, CBigInt &r2)
         else
             tem = add(r1.num, r2.num);
     }
-    else //åŒå·
+    else //Í¬ºÅ
     {
         if (r1.flag == 1)
         {
@@ -105,18 +105,18 @@ CBigInt operator*(CBigInt &r1, CBigInt &r2)
 {
     string tem;
     tem = mul(r1.num, r2.num);
-    if (r1.flag ^ r2.flag) //å¼‚å·
+    if (r1.flag ^ r2.flag) //ÒìºÅ
         tem = '-' + tem;
     return CBigInt(tem);
 }
-string add(string s1, string s2) //æ­£æ•°åŠ æ³•
+string add(string s1, string s2) //ÕýÊý¼Ó·¨
 {
     string result;
     int a;
     char c;
     reverse(s1.begin(), s1.end());
     reverse(s2.begin(), s2.end());
-    result.push_back('0'); //é¢„å¤„ç†
+    result.push_back('0'); //Ô¤´¦Àí
     while (!s1.empty() && !s2.empty())
     {
         a = (s1.front() - '0') + (s2.front() - '0') + (result.back() - '0');
@@ -154,12 +154,12 @@ string add(string s1, string s2) //æ­£æ•°åŠ æ³•
         result.erase(result.begin());
     return result;
 }
-string sub(string a, string b) //å®žçŽ°a - b
+string sub(string a, string b) //ÊµÏÖa - b
 {
     int i, j, k, s, flag = 1;
     int tmpa[10000], tmpb[10000], c[10000];
     string result;
-    if (a.size() < b.size() || (a.size() == b.size() && a.compare(b) < 0)) //åˆ¤æ–­å¤§å°
+    if (a.size() < b.size() || (a.size() == b.size() && a.compare(b) < 0)) //ÅÐ¶Ï´óÐ¡
     {
         string tmp = a;
         a = b;
@@ -199,7 +199,7 @@ string sub(string a, string b) //å®žçŽ°a - b
         result = '-' + result;
     return result;
 }
-string mul(string s1, string s2) //æ­£æ•°ä¹˜æ³•
+string mul(string s1, string s2) //ÕýÊý³Ë·¨
 {
     string result = "0";
     int i;
@@ -235,3 +235,45 @@ int main()
     }
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+¶¨Òå´óÕûÊýÀàCBigInteger£¨¼ÙÉè×î³¤Ö§³Ö1000Î»£©£¬Êý¾Ý³ÉÔ±ÎªÒ»¸ö×Ö·ûÖ¸Õë¡£³ÉÔ±º¯Êý»òÓÑÔªº¯Êý°üÀ¨£º
+
+1£©´ø²Î¹¹Ôìº¯Êý£¬Îª×Ö·ûÖ¸Õë¶¯Ì¬·ÖÅä1001¸ö×Ö·û¿Õ¼ä¡£¸ù¾Ý²ÎÊý³õÊ¼»¯´óÕûÊý¡£
+
+2)  ÎÞ²Î¹¹Ôìº¯Êý£¬Îª×Ö·ûÖ¸Õë¶¯Ì¬·ÖÅä1001¸ö×Ö·û¿Õ¼ä¡£
+
+3£©ÖØÔØÔËËã·û+£¬ÊµÏÖÁ½¸ö´óÕûÊýµÄ¼Ó·¨¡£
+
+4£©ÖØÔØÔËËã·û-£¬ÊµÏÖÁ½¸ö´óÕûÊýµÄ¼õ·¨¡£
+
+5£©ÖØÔØÔËËã·û*£¬ÊµÏÖÁ½¸ö´óÕûÊýµÄ³Ë·¨¡£
+
+6£©ÖØÔØÊäÈë£¬ÊäÈë´óÕûÊý¡£
+
+7£©ÖØÔØÊä³ö£¬Êä³ö´óÕûÊý¡£
+
+8£©Îö¹¹º¯Êý£¬ÊÍ·Å·ÖÅäµÄ¿Õ¼ä¡£¸Ãº¯Êý²»¿ÉÆÁ±Î¡£
+
+Ö÷º¯ÊýÊäÈë´óÕûÊý£¬Íê³É´óÕûÊýµÄ¼Ó¡¢¼õ¡¢³Ë¡£Ö÷º¯Êý´úÂëÈçÏÂ£¬²»¿ÉÐÞ¸Ä¡£
+
+
+
+ÊäÈë
+²âÊÔ´ÎÊý
+
+Ã¿×é²âÊÔÊý¾ÝÒ»ÐÐ£º ´óÕûÊý1 ÔËËã·û ´óÕûÊý2
+
+Êä³ö
+ ¶ÔÃ¿×é²âÊÔÊý¾ÝÊä³ö±í´ïÊ½ºÍ¼ÆËã½á¹û£¬¾ßÌå¸ñÊ½¼ûÑùÀý¡£
+
+ÑùÀýÊäÈë
+3
+100 * -100
+-123456789 + 123456
+0001 - -123
+ÑùÀýÊä³ö
+100 * (-100) = (-10000)
+(-123456789) + 123456 = (-123333333)
+1 - (-123) = 124
+*/

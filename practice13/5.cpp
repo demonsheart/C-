@@ -4,8 +4,8 @@ using namespace std;
 class Group
 {
 public:
-    virtual int add(int x, int y) = 0; //è¾“å‡ºåŠ æ³•çš„è¿ç®—ç»“æœ
-    virtual int sub(int x, int y) = 0; //è¾“å‡ºå‡æ³•çš„è¿ç®—ç»“æœ
+    virtual int add(int x, int y) = 0; //Êä³ö¼Ó·¨µÄÔËËã½á¹û
+    virtual int sub(int x, int y) = 0; //Êä³ö¼õ·¨µÄÔËËã½á¹û
 };
 class GroupA : public Group
 {
@@ -63,27 +63,67 @@ int main()
         if (n == 1)
         {
             p = new GroupA();
-            if(c == '+')
-            cout<<p->add(a,b)<<endl;
-            else if(c == '-')
-            cout<<p->sub(a,b)<<endl;
+            if (c == '+')
+                cout << p->add(a, b) << endl;
+            else if (c == '-')
+                cout << p->sub(a, b) << endl;
         }
         else if (n == 2)
         {
             p = new GroupB();
-            if(c == '+')
-            cout<<p->add(a,b)<<endl;
-            else if(c == '-')
-            cout<<p->sub(a,b)<<endl;
+            if (c == '+')
+                cout << p->add(a, b) << endl;
+            else if (c == '-')
+                cout << p->sub(a, b) << endl;
         }
         else if (n == 3)
         {
             p = new GroupC();
-            if(c == '+')
-            cout<<p->add(a,b)<<endl;
-            else if(c == '-')
-            cout<<p->sub(a,b)<<endl;
+            if (c == '+')
+                cout << p->add(a, b) << endl;
+            else if (c == '-')
+                cout << p->sub(a, b) << endl;
         }
     }
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+Ä³Ğ¡Ñ§¶şÄê¼¶µÄÊıÑ§ÀÏÊ¦ÔÚ½ÌÑ§ÉúÕûÊı¼Ó¼õ·¨ÔËËãÊ±·¢ÏÖ£º°àÉÏµÄÍ¬Ñ§¿ÉÒÔ·Ö³ÉÈıÀà£¬µÚÒ»Àà¿ÉÒÔÕıÈ·µØÍê³É¼Ó¼õ·¨ÔËËã(GroupA)£»µÚ¶şÀà¿ÉÒÔÕıÈ·µØÍê³É¼Ó·¨ÔËËã£¬µ«¶ÔÓÚ¼õ·¨ÔËËãÀ´Ëµ£¬×ÜÊÇÍü¼Ç½èÎ»µÄ´¦Àí(GroupB)£»µÚÈıÀà×ÜÊÇÍü¼Ç¼Ó·¨µÄ½øÎ»£¬Ò²×ÜÊÇÍü¼Ç¼õ·¨µÄ½èÎ»(GroupC)¡££¨ÌáÊ¾£ºĞ¡Ñ§¶şÄê¼¶»¹Ã»Ñ§¸ºÊı¡££©
+
+ÏÖÔÚÇëÄ£Äâµ±ÀÏÊ¦ÔÚ¿ÎÌÃÌáÎÊÄ³Î»Í¬Ñ§Ê±£¬Í¬Ñ§»á¸ø³öµÄ»Ø´ğ¡£
+
+ÊµÏÖÊ±Çë»ùÓÚÏÂÃæµÄ»ùÀà¿ò¼Ü£º
+
+class Group
+
+{
+
+public:
+
+virtual int add(int x, int y)=0;//Êä³ö¼Ó·¨µÄÔËËã½á¹û
+
+virtual int sub(int x, int y)=0;//Êä³ö¼õ·¨µÄÔËËã½á¹û
+
+}
+
+¹¹½¨³öGroupA, GroupBºÍGroupCÈı¸öÅÉ³öÀà:
+
+²¢±àĞ´Ö÷º¯Êı£¬ÒªÇóÖ÷º¯ÊıÖĞÓĞÒ»¸ö»ùÀàGroupÖ¸Õë£¬Í¨¹ı¸ÃÖ¸ÕëÍ³Ò»µØ½øĞĞaddºÍsubÔËËã¡£
+
+ÊäÈë
+µÚÒ»ĞĞ±íÊ¾²âÊÔ´ÎÊı¡£´ÓµÚ¶şĞĞ¿ªÊ¼£¬Ã¿¸ö²âÊÔÓÃÀıÕ¼Ò»ĞĞ£¬Ã¿ĞĞÊı¾İÒâÒåÈçÏÂ£ºÑ§ÉúÀà±ğ£¨1ÎªµÚÒ»ÀàÑ§Éú£¬2ÎªµÚ¶şÀàÑ§Éú£¬3ÎªµÚÈıÀàÑ§Éú£©¡¢µÚÒ»¸öÊı¡¢µÚ¶ş¸öÊı¡£
+
+Êä³ö
+ÔËËãºóµÄ½á¹û
+
+ÑùÀıÊäÈë
+3
+1 79+81
+2 81-79
+3 183+69
+ÑùÀıÊä³ö
+160
+12
+142
+*/

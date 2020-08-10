@@ -97,3 +97,63 @@ int main()
 
     return 0;
 }
+/*
+题目描述
+1、建立如下的类继承结构：
+
+1)        定义一个人员类CPeople，其属性（保护类型）有：姓名、性别、年龄；
+
+2)        从CPeople类派生出学生类CStudent，添加属性：学号和入学成绩；
+
+3)        从CPeople类再派生出教师类CTeacher，添加属性：职务、部门；
+
+4)        从CStudent和CTeacher类共同派生出在职研究生类CGradOnWork，添加属性：研究方向、导师；
+
+2、分别定义以上类的构造函数、输出函数print及其他函数（如需要）。
+
+3、在主函数中定义各种类的对象，并测试之。
+
+输入
+第一行：姓名性别年龄
+第二行：学号成绩
+第三行：职务部门
+第四行：研究方向导师
+输出
+第一行：People:
+第二行及以后各行：格式见Sample
+样例输入
+wang-li m 23
+2012100365 92.5
+assistant computer
+robot zhao-jun
+样例输出
+People:
+Name: wang-li
+Sex: m
+Age: 23
+
+Student:
+Name: wang-li
+Sex: m
+Age: 23
+No.: 2012100365
+Score: 92.5
+
+Teacher:
+Name: wang-li
+Sex: m
+Age: 23
+Position: assistant
+Department: computer
+
+GradOnWork:
+Name: wang-li
+Sex: m
+Age: 23
+No.: 2012100365
+Score: 92.5
+Position: assistant
+Department: computer
+Direction: robot
+Tutor: zhao-jun
+*/

@@ -21,7 +21,7 @@ public:
         head = new CNode<T>;
         head->next = NULL;
     }
-    void append(T a) //åŠ åˆ°é“¾è¡¨æœ€å
+    void append(T a) //¼Óµ½Á´±í×îºó
     {
         CNode<T> *p = new CNode<T>;
         p->data = a;
@@ -31,7 +31,7 @@ public:
             p1 = p1->next;
         p1->next = p;
     }
-    void insert(T a, int n) //åœ¨ç¬¬nä¸ªç»“ç‚¹ååŠ 
+    void insert(T a, int n) //ÔÚµÚn¸ö½áµãºó¼Ó
     {
         CNode<T> *p1, *p2 = head;
         p1 = new CNode<T>;
@@ -45,7 +45,7 @@ public:
         p1->next = p2->next;
         p2->next = p1;
     }
-    void remove(int n) //ç§»é™¤ç¬¬nä¸ªç»“ç‚¹
+    void remove(int n) //ÒÆ³ıµÚn¸ö½áµã
     {
         CNode<T> *p = head, *q;
         if (n == 0)
@@ -62,7 +62,7 @@ public:
         }
         q = p->next;
         p->next = p->next->next;
-        delete q;//é‡Šæ”¾ç»“ç‚¹
+        delete q; //ÊÍ·Å½áµã
         return;
     }
     bool judge(int n)
@@ -76,14 +76,14 @@ public:
         }
         return true;
     }
-    T get(int n) //è¿”å›ç¬¬nä¸ªç»“ç‚¹çš„æ•°æ®
+    T get(int n) //·µ»ØµÚn¸ö½áµãµÄÊı¾İ
     {
         CNode<T> *p = head;
         while (n--)
             p = p->next;
         return p->data;
     }
-    void set(T a, int n) //å°†ç¬¬nä¸ªèŠ‚ç‚¹çš„æ•°æ®æ”¹æˆa
+    void set(T a, int n) //½«µÚn¸ö½ÚµãµÄÊı¾İ¸Ä³Éa
     {
         remove(n);
         insert(a, n - 1);
@@ -188,3 +188,93 @@ int main()
     }
     return 0;
 }
+/*
+ÌâÄ¿ÃèÊö
+½áµãÊı¾İÀàĞÍÎªintµÄµ¥Á´±íÀàCIntList¿É¶¨ÒåÈçÏÂ:
+
+class CNode
+
+{
+
+public:
+
+int data;
+
+CNode *next;
+
+};
+
+class CIntList
+
+{
+
+private:
+
+CNode *head;
+
+public:
+
+CIntList();
+
+void append(int a); //¼Óµ½Á´±í×îºó
+
+void insert(int a, int n); //ÔÚµÚn¸ö½áµãºó¼Ó
+
+void remove(int n); //ÒÆ³ıµÚn¸ö½áµã
+
+int get(int n); //·µ»ØµÚn¸ö½áµãµÄÊı¾İ
+
+void set(int a, int n); //½«µÚn¸ö½ÚµãµÄÊı¾İ¸Ä³Éa
+
+void print();
+
+~CIntList();
+
+};
+
+ÊÔ½«Æä¸Ä³É½áµãÊı¾İÀàĞÍÓÃ²ÎÊı±íÊ¾µÄÀàÄ£°åCList¡£
+
+ÊäÈë
+µÚÒ»ĞĞÊäÈë²âÊÔ´ÎÊı
+
+Ã¿´Î²âÊÔÊäÈë5ĞĞ,¸ñÊ½Îª£º
+
+Êı¾İÀàĞÍ(I:int, D:double, S:string) Êı¾İ¸öÊın Êı¾İ1 Êı¾İ2 ... Êı¾İn
+
+²åÈë½ÚµãºÅ(0±íÊ¾²åÔÚµÚ1¸ö½áµãÇ°Ãæ) Êı¾İ
+
+·µ»Ø½áµãºÅ
+
+É¾³ı½áµãºÅ
+
+ĞŞ¸Ä½áµãºÅ Êı¾İ
+
+Êä³ö
+Ã¿´Î²âÊÔÊä³ö¶şĞĞ.µÚ1ĞĞÊä³ö·µ»Ø²Ù×÷»ñµÃµÄÊı¾İ(Èç³ö´íÔòÊä³öerror),µÚ2ĞĞÊä³öËùÓĞ²Ù×÷ºóÁ´±íÈ«²¿½áµãµÄÊı¾İ.
+
+ÑùÀıÊäÈë
+3
+I 5 2 3 5 7 3
+1 40
+7
+7
+6 -10
+D 6 1.1 2.3 10.05 0.0 -1.8 5.9
+4 60.4
+5
+1
+3 -3.7
+S 4 this is a test.
+0 good
+1
+8
+4 work
+
+ÑùÀıÊä³ö
+error
+2 40 3 5 7 -10
+60.4
+2.3 10.05 -3.7 60.4 -1.8 5.9
+good
+good this is work test.
+*/

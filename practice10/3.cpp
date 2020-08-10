@@ -125,3 +125,27 @@ int main()
     s.settings();
     return 0;
 }
+
+/*
+题目描述
+有如下的电视类和遥控器类，遥控器在电视开机的情况下可以控制电视。
+
+
+
+
+要求如下：
+1.     实现并完善Tv类；其中构造函数需修改和完善。另：最大频道为100；
+2.     将Remote设为Tv的友元类，以支持在Remote类中对Tv方法的调用。
+3.     在main函数中，通过Remote实例对TV实例进行操作。
+输入
+第一行，电视初始状态，依次为state,volume,channel,mode,input的初始值。
+第二行，利用遥控器对上述状态的操作指令，用对应的函数名表示，如增加音量为volup
+输出
+第一行，执行遥控器操作后的状态。
+
+样例输入
+off 10 19 Cable VCR
+onoff volup chanup set_mode set_input
+样例输出
+on 11 20 Antenna TV
+*/
